@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>RSD Control System | Group 3</title>
+        <link rel="stylesheet" type="text/css" media="all" title="Style sheet" href="style.css" />
+
+        <!-- Tab menu -->
+        <script src="script.js"></script>
+    </head>
+    <body onload="on_loaded_page()">
+        <div id="header" data-role="header" data-position="fixed">
+            <h1>RSD Control System</h1>
+        </div>
+        <div id="ui_frame">
+            <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" checked>
+            <label for="input_tab1" class="tabs_labels">Mobile robot</label>
+            <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs">
+            <label for="input_tab2" class="tabs_labels">Workcell</label>
+            <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs">
+            <label for="input_tab3" class="tabs_labels">General</label>
+
+            <section id="tabs_content1"  class="tabs_sections">
+                Mobile robot content
+            </section>
+
+            <section id="tabs_content2"  class="tabs_sections">
+                Workcell content
+            </section>
+
+            <section id="tabs_content3"  class="tabs_sections">
+                General content
+            </section>
+        </div>
+    </body>
+</html>

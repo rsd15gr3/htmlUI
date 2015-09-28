@@ -28,15 +28,37 @@ html {
 	right: 0;
 	z-index: 100;
 	width: 800px;
-	height: 285px;
 	background-color: White;
 	margin: auto;
 	border: 1px solid DarkGray;
 }
 
+#main_control_line {
+    height: 50px;
+    background-color: #eee;
+}
+
+#console_frame {
+    background-color: #eee;
+    text-align: center;
+    border-top: 1px solid #ccc;
+}
+
+#textarea_console {
+    background-color: transparent;
+    font-size: 13px;
+    font-family: Courier;
+    text-align: left;
+    line-height: 1.3em;
+    margin: 5px;
+    border: 0px;
+}
+
+/* Tabs */
 .tabs_sections {
   display: none;
-  padding: 20px 0 0;
+  font-size: 14px;
+  padding: 20px;
   border-top: 1px solid #ddd;
 }
 
@@ -46,9 +68,9 @@ html {
 
 .tabs_labels {
   display: inline-block;
-  padding: 15px 25px;
+  color: #555;
   text-align: center;
-  color: Black;
+  padding: 15px 25px;
   border: 1px solid transparent;
 }
 
@@ -58,7 +80,7 @@ html {
 }
 
 .tabs_inputs:checked + .tabs_labels {
-  color: #555;
+  color: Black;
   border: 0px solid #ddd;
   border-top: 3px solid DarkBlue;
   border-bottom: 1px solid #fff;
@@ -69,4 +91,182 @@ html {
 #input_tab3:checked ~ #tabs_content3,
 #input_tab4:checked ~ #tabs_content4 {
   display: block;
+}
+
+#tabs_content1 {
+    text-align: center;
+}
+
+#manual_control_frame {
+    height: 200px;
+    text-align: center;
+    padding: 5px;
+    margin: 10px;
+}
+
+#mc_button_up {
+    position: absolute;
+    top: 180px;
+    left: 150px;
+    width: 50px;
+}
+
+#mc_button_left {
+    position: absolute;
+    top: 230px;
+    left: 100px;
+    width: 50px;
+}
+
+#mc_button_right {
+    position: absolute;
+    top: 230px;
+    left: 200px;
+    width: 50px;
+}
+
+#mc_button_down {
+    position: absolute;
+    top: 280px;
+    left: 150px;
+    width: 50px;
+}
+
+
+/* Main control line : systems ready? (Might be written better : TODO) */
+.onoffswitch {
+    position: relative;
+    width: 110px;
+    float: left;
+    margin: 10px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid DarkGreen; border-radius: 5px;
+}
+
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 25px; padding: 0; line-height: 25px;
+    font-size: 13px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    padding-left: 13px;
+    background-color: #31D613; color: #000000;
+}
+.onoffswitch-inner:after {
+    padding-right: 13px;
+    background-color: #ccc; color: #000000;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 10px; margin: 7.5px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 80px;
+    border: 2px solid #999999; border-radius: 5px;
+    transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}
+
+#inner_onoff_mes:before {
+    content: "MES";
+}
+
+#inner_onoff_mes:after {
+    content: "MES";
+}
+
+#inner_onoff_frobit:before {
+    content: "Frobit";
+}
+
+#inner_onoff_frobit:after {
+    content: "Frobit";
+}
+
+#inner_onoff_frobit_sim:before {
+    content: "Frobit-sim";
+}
+
+#inner_onoff_frobit_sim:after {
+    content: "Frobit-sim";
+}
+
+#inner_onoff_kuka:before {
+    content: "Kuka";
+}
+
+#inner_onoff_kuka:after {
+    content: "Kuka";
+}
+
+#inner_onoff_kuka_sim:before {
+    content: "Kuka-sim";
+}
+
+#inner_onoff_kuka_sim:after {
+    content: "Kuka-sim";
+}
+
+/* Auto-manual control switch */
+.automanualswitch {
+    position: relative;
+    margin-left: 300px;
+    width: 160px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.automanualswitch-checkbox {
+    display: none;
+}
+.automanualswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #000000; border-radius: 8px;
+}
+.automanualswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.automanualswitch-inner:before, .automanualswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.automanualswitch-inner:before {
+    content: "AUTO Control";
+    padding-left: 10px;
+    background-color: #339CFF; color: #000000;
+}
+.automanualswitch-inner:after {
+    content: "MANUAL Control";
+    padding-right: 10px;
+    background-color: #EEEEEE; color: #000000;
+    text-align: right;
+}
+.automanualswitch-switch {
+    display: block; width: 15px; margin: 7.5px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 126px;
+    border: 2px solid #000000; border-radius: 8px;
+    transition: all 0.3s ease-in 0s;
+}
+.automanualswitch-checkbox:checked + .automanualswitch-label .automanualswitch-inner {
+    margin-left: 0;
+}
+.automanualswitch-checkbox:checked + .automanualswitch-label .automanualswitch-switch {
+    right: 0px;
 }

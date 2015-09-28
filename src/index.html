@@ -3,34 +3,134 @@
     <head lang="en">
         <meta charset="UTF-8">
         <title>RSD Control System | Group 3</title>
+
+        <!-- CSS Styles -->
         <link rel="stylesheet" type="text/css" media="all" title="Style sheet" href="style.css" />
 
-        <!-- Tab menu -->
+        <!-- Scripts -->
+        <script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+        <script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
         <script src="script.js"></script>
+        <script type="text/javascript">
+            // Connecting to ROS
+            var ros = new ROSLIB.Ros({
+                url : 'ws://localhost:9090'
+            });
+
+            ros.on('connection', function() {
+                console.log('Connected to websocket server.');
+                to_console('Connected to websocket server.');
+            });
+
+            ros.on('error', function(error) {
+                console.log('Error connecting to websocket server: ', error);
+                to_console('Error connecting to websocket server.');
+            });
+
+            ros.on('close', function() {
+                console.log('Connection to websocket server closed.');
+                to_console('Connection to websocket server closed.');
+            });
+
+            var cmd_vel_topic = new ROSLIB.Topic({
+                ros : ros,
+                name : '/fmCommand/cmd_vel',
+                messageType : 'geometry_msgs/TwistStamped'
+            });
+
+            // Parameters
+            var vel_lin_step = 0.1;
+            var vel_ang_step = 0.1;
+            var current_vel_lin = 0;
+            var current_vel_ang = 0;
+        </script>
     </head>
     <body onload="on_loaded_page()">
         <div id="header" data-role="header" data-position="fixed">
             <h1>RSD Control System</h1>
         </div>
         <div id="ui_frame">
-            <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" checked>
-            <label for="input_tab1" class="tabs_labels">Mobile robot</label>
-            <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs">
-            <label for="input_tab2" class="tabs_labels">Workcell</label>
-            <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs">
-            <label for="input_tab3" class="tabs_labels">General</label>
+            <div id="main_control_line">
+                <div class="onoffswitch">
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_mes" disabled>
+                    <label class="onoffswitch-label" for="onoff_mes">
+                        <span id="inner_onoff_mes" class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_frobit" disabled>
+                    <label class="onoffswitch-label" for="onoff_frobit">
+                        <span id="inner_onoff_frobit" class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_frobit_sim" disabled>
+                    <label class="onoffswitch-label" for="onoff_frobit_sim">
+                        <span id="inner_onoff_frobit_sim" class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_kuka" disabled>
+                    <label class="onoffswitch-label" for="onoff_kuka">
+                        <span id="inner_onoff_kuka" class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_kuka_sim" disabled>
+                    <label class="onoffswitch-label" for="onoff_kuka_sim">
+                        <span id="inner_onoff_kuka_sim" class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+            </div>
+            <div id="tabs_frame">
+                <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" checked>
+                <label for="input_tab1" class="tabs_labels">Mobile robot</label>
+                <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs">
+                <label for="input_tab2" class="tabs_labels">Workcell</label>
+                <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs">
+                <label for="input_tab3" class="tabs_labels">General</label>
+                <input id="input_tab4" type="radio" name="tabs" class="tabs_inputs">
+                <label for="input_tab4" class="tabs_labels">rqt_graph</label>
 
-            <section id="tabs_content1"  class="tabs_sections">
-                Mobile robot content
-            </section>
+                <section id="tabs_content1"  class="tabs_sections">
+                    <div class="automanualswitch">
+                        <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="myautomanualswitch">
+                        <label class="automanualswitch-label" for="myautomanualswitch">
+                            <span class="automanualswitch-inner"></span>
+                            <span class="automanualswitch-switch"></span>
+                        </label>
+                    </div>
 
-            <section id="tabs_content2"  class="tabs_sections">
-                Workcell content
-            </section>
+                    <div id="manual_control_frame">
+                        <input id="mc_button_up" type="image" src="../img/arrow_up.png" onclick="manual_button_pressed('up');"/>
+                        <input id="mc_button_left" type="image" src="../img/arrow_left.png" onclick="manual_button_pressed('left');" />
+                        <input id="mc_button_right" type="image" src="../img/arrow_right.png" onclick="manual_button_pressed('right');" />
+                        <input id="mc_button_down" type="image" src="../img/arrow_down.png" onclick="manual_button_pressed('down');" />
+                    </div>
 
-            <section id="tabs_content3"  class="tabs_sections">
-                General content
-            </section>
+                </section>
+
+                <section id="tabs_content2"  class="tabs_sections">
+                    Workcell content
+                </section>
+
+                <section id="tabs_content3"  class="tabs_sections">
+                    General content
+                </section>
+
+                <section id="tabs_content4"  class="tabs_sections">
+                    Graph here
+                </section>
+            </div>
+            <div id="console_frame">
+                <textarea id="textarea_console" rows="4" cols="95">
+                </textarea>
+            </div>
         </div>
     </body>
 </html>

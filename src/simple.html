@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="simple.css">
+
+<script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+  // Connecting to ROS
+  // -----------------
+
+  var ros = new ROSLIB.Ros({
+    url : 'ws://localhost:9090'
+  });
+
+  ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+  });
+
+  ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+  });
+
+  ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+  });
+
+  // Subscribing to a Topic
+  // ----------------------
+  var listener_speed = new ROSLIB.Topic({
+    ros : ros,
+    name : '/safe_vel',
+    messageType : 'geometry_msgs/TwistStamped' 
+  })
+
+  listener_speed.subscribe(function(message) {
+      console.log('Received message on ' + listener_speed.name);
+      document.getElementById("Linear").innerHTML = "Linear speed: " + message.twist.linear.x + " m/s";
+      document.getElementById("Angular").innerHTML = "Angular speed: " + message.twist.angular.z + " rad/s";
+  });
+
+  var listener_deadman = new ROSLIB.Topic({
+    ros : ros,
+    name : '/fmSafe/deadman',
+    messageType : 'msgs/BoolStamped'
+  })
+
+  listener_deadman.subscribe(function(message) {
+    console.log('Received message on ' + listener_deadman.name);
+    if(message.data){
+      document.getElementById("deadman_button").checked=true;
+    }
+    else{
+      document.getElementById("deadman_button").checked=false;
+    }
+
+  });
+
+  var listener_automan = new ROSLIB.Topic({
+    ros : ros,
+    name : '/fmPlan/automode',
+    messageType : 'msgs/BoolStamped'
+  })
+
+  listener_automan.subscribe(function(message) {
+    console.log('Received message on ' + listener_automan.name);
+    if(message.data){
+      document.getElementById("manual_button").checked=false;
+      document.getElementById("auto_button").checked=true;
+    }
+    else{
+      document.getElementById("manual_button").checked=true;
+      document.getElementById("auto_button").checked=false;
+    }
+  });
+
+</script>
+</head>
+
+<body>
+  <h1>Frobit3 robot HMI</h1>
+  <p id="Linear">Linear speed: 0 m/s</p>
+  <p id="Angular">Angular speed: 0 rad/s</p>
+  <input type="radio" id="deadman_button" name="deadman" value="Deadman" onclick="return false"> Deadman signal<br>
+  <input type="radio" id="manual_button" name="manual" value="Manual" onclick="return false"> Manual mode<br>
+  <input type="radio" id="auto_button" name="auto" value="Auto" onclick="return false"> Auto mode<br>
+</body>
+</html>

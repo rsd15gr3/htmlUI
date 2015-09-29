@@ -5,7 +5,8 @@
         <title>RSD Control System | Group 3</title>
 
         <!-- CSS Styles -->
-        <link rel="stylesheet" type="text/css" media="all" title="Style sheet" href="style.css" />
+        <link rel="stylesheet" type="text/css" media="all" title="Style sheet" href="style_main.css" />     <!-- Manually written cool stuff -->
+        <link rel="stylesheet" type="text/css" media="all" title="Style sheet" href="style_gen.css" />      <!-- Auto-generated fancy stuff -->
 
         <!-- Scripts -->
         <script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
@@ -32,22 +33,16 @@
                 to_console('Connection to websocket server closed.');
             });
 
-            var cmd_vel_topic = new ROSLIB.Topic({
+            var ui_str_control_topic = new ROSLIB.Topic({
                 ros : ros,
-                name : '/fmCommand/cmd_vel',
-                messageType : 'geometry_msgs/TwistStamped'
+                name : '/ui_str_control',
+                messageType : 'String'
             });
-
-            // Parameters
-            var vel_lin_step = 0.1;
-            var vel_ang_step = 0.1;
-            var current_vel_lin = 0;
-            var current_vel_ang = 0;
         </script>
     </head>
     <body onload="on_loaded_page()">
         <div id="header" data-role="header" data-position="fixed">
-            <h1>RSD Control System</h1>
+            RSD Control System
         </div>
         <div id="ui_frame">
             <div id="main_control_line">
@@ -94,23 +89,22 @@
                 <label for="input_tab2" class="tabs_labels">Workcell</label>
                 <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs">
                 <label for="input_tab3" class="tabs_labels">General</label>
-                <input id="input_tab4" type="radio" name="tabs" class="tabs_inputs">
-                <label for="input_tab4" class="tabs_labels">rqt_graph</label>
 
                 <section id="tabs_content1"  class="tabs_sections">
                     <div class="automanualswitch">
-                        <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="myautomanualswitch">
-                        <label class="automanualswitch-label" for="myautomanualswitch">
+                        <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();">
+                        <label class="automanualswitch-label" for="mr_man_auto_switch">
                             <span class="automanualswitch-inner"></span>
                             <span class="automanualswitch-switch"></span>
                         </label>
                     </div>
 
                     <div id="manual_control_frame">
-                        <input id="mc_button_up" type="image" src="../img/arrow_up.png" onclick="manual_button_pressed('up');"/>
-                        <input id="mc_button_left" type="image" src="../img/arrow_left.png" onclick="manual_button_pressed('left');" />
-                        <input id="mc_button_right" type="image" src="../img/arrow_right.png" onclick="manual_button_pressed('right');" />
-                        <input id="mc_button_down" type="image" src="../img/arrow_down.png" onclick="manual_button_pressed('down');" />
+                        <input id="mc_button_up" type="image" src="../img/arrow_up.png" onclick="ros_btn_msg('forward');"/>
+                        <input id="mc_button_left" type="image" src="../img/arrow_left.png" onclick="ros_btn_msg('left');" />
+                        <input id="mc_button_right" type="image" src="../img/arrow_right.png" onclick="ros_btn_msg('right');" />
+                        <input id="mc_button_down" type="image" src="../img/arrow_down.png" onclick="ros_btn_msg('back');" />
+                        <input id="mc_button_stop" type="image" src="../img/stop.png" onclick="ros_btn_msg('stop');" />
                     </div>
 
                 </section>
@@ -121,10 +115,6 @@
 
                 <section id="tabs_content3"  class="tabs_sections">
                     General content
-                </section>
-
-                <section id="tabs_content4"  class="tabs_sections">
-                    Graph here
                 </section>
             </div>
             <div id="console_frame">

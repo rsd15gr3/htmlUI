@@ -1,0 +1,146 @@
+@import url("http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css");
+
+html {
+    background-color: LightGray;
+    font-family: fontawesome;
+}
+
+#header {
+    position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 30;
+	width: 100%;
+	height: 44px;
+    background-image: url(../img/bg_header.png);
+	background-repeat: repeat-x;
+	background-color: Black;
+    color: White;
+    font-size: 25px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.7em;
+}
+
+#ui_frame {
+	position: absolute;
+	top: 44px;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	width: 800px;
+	background-color: White;
+	margin: auto;
+	border: 1px solid DarkGray;
+}
+
+#main_control_line {
+    height: 50px;
+    background-color: #eee;
+}
+
+#console_frame {
+    background-color: #eee;
+    text-align: center;
+    border-top: 1px solid #ccc;
+}
+
+#textarea_console {
+    background-color: transparent;
+    font-size: 13px;
+    font-family: Courier;
+    text-align: left;
+    line-height: 1.3em;
+    margin: 5px;
+    border: 0px;
+}
+
+/* Tabs */
+.tabs_sections {
+  display: none;
+  font-size: 14px;
+  padding: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.tabs_inputs {
+  display: none;
+}
+
+.tabs_labels {
+  display: inline-block;
+  color: #555;
+  text-align: center;
+  padding: 15px 25px;
+  border: 1px solid transparent;
+}
+
+.tabs_labels:hover {
+  color: DarkBlue;
+  cursor: pointer;
+}
+
+.tabs_inputs:checked + .tabs_labels {
+  color: Black;
+  border: 0px solid #ddd;
+  border-top: 3px solid DarkBlue;
+  border-bottom: 1px solid #fff;
+}
+
+#input_tab1:checked ~ #tabs_content1,
+#input_tab2:checked ~ #tabs_content2,
+#input_tab3:checked ~ #tabs_content3,
+#input_tab4:checked ~ #tabs_content4 {
+  display: block;
+}
+
+#tabs_content1 {
+    text-align: center;
+}
+
+#manual_control_frame {
+    height: 200px;
+    text-align: center;
+    padding: 5px;
+    margin: 10px;
+}
+
+#mc_button_up {
+    position: absolute;
+    top: 150px;
+    left: 150px;
+    width: 75px;
+    height: 75px;
+}
+
+#mc_button_left {
+    position: absolute;
+    top: 225px;
+    left: 75px;
+    width: 75px;
+    height: 75px;
+}
+
+#mc_button_right {
+    position: absolute;
+    top: 225px;
+    left: 225px;
+    width: 75px;
+    height: 75px;
+}
+
+#mc_button_down {
+    position: absolute;
+    top: 300px;
+    left: 150px;
+    width: 75px;
+    height: 75px;
+}
+
+#mc_button_stop {
+    position: absolute;
+    top: 225px;
+    left: 150px;
+    width: 75px;
+    height: 75px;
+}

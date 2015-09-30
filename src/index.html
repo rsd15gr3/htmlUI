@@ -11,6 +11,7 @@
         <!-- Scripts -->
         <script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
         <script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+        <script src="jquery-1.11.3.js"></script>
         <script src="script.js"></script>
         <script type="text/javascript">
             // Connecting to ROS
@@ -33,11 +34,19 @@
                 to_console('Connection to websocket server closed.');
             });
 
+            // Topics
             var ui_str_control_topic = new ROSLIB.Topic({
                 ros : ros,
                 name : '/ui_str_control',
                 messageType : 'String'
             });
+
+            var cmd_vel_topic = new ROSLIB.Topic({
+                ros : ros,
+                name : '/fmCommand/cmd_vel',
+                messageType : 'geometry_msgs/TwistStamped'
+            });
+
         </script>
     </head>
     <body onload="on_loaded_page()">
@@ -91,15 +100,14 @@
                 <label for="input_tab3" class="tabs_labels">General</label>
 
                 <section id="tabs_content1"  class="tabs_sections">
-                    <div class="automanualswitch">
-                        <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();">
-                        <label class="automanualswitch-label" for="mr_man_auto_switch">
-                            <span class="automanualswitch-inner"></span>
-                            <span class="automanualswitch-switch"></span>
-                        </label>
-                    </div>
-
-                    <div id="manual_control_frame">
+                    <div id="manual_control_frame" tabindex="0">
+                         <div class="automanualswitch">
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();">
+                            <label class="automanualswitch-label" for="mr_man_auto_switch">
+                                <span class="automanualswitch-inner"></span>
+                                <span class="automanualswitch-switch"></span>
+                            </label>
+                        </div>
                         <input id="mc_button_up" type="image" src="../img/arrow_up.png" onclick="ros_btn_msg('forward');"/>
                         <input id="mc_button_left" type="image" src="../img/arrow_left.png" onclick="ros_btn_msg('left');" />
                         <input id="mc_button_right" type="image" src="../img/arrow_right.png" onclick="ros_btn_msg('right');" />
@@ -107,6 +115,33 @@
                         <input id="mc_button_stop" type="image" src="../img/stop.png" onclick="ros_btn_msg('stop');" />
                     </div>
 
+                    <div id="mr_monitor_frame">
+                        <div id="mr_monitor_frame_header">
+                            MR Online Monitor
+                        </div>
+                        <table id="mr_monitor_frame_content">
+                            <tr>
+                                <td class="mr_monitor_frame_content_td1">Mode:</td>
+                                <td class="mr_monitor_frame_content_td2" id="mr_monitor_cell_mode"></td>
+                            </tr>
+                            <tr>
+                                <td class="mr_monitor_frame_content_td1">Linear velocity:</td>
+                                <td class="mr_monitor_frame_content_td2" id="mr_monitor_cell_lin_vel"></td>
+                            </tr>
+                            <tr>
+                                <td class="mr_monitor_frame_content_td1">Angular velocity:</td>
+                                <td class="mr_monitor_frame_content_td2" id="mr_monitor_cell_ang_vel"></td>
+                            </tr>
+                            <tr>
+                                <td class="mr_monitor_frame_content_td1">Mission:</td>
+                                <td class="mr_monitor_frame_content_td2" id="mr_monitor_cell_mission"></td>
+                            </tr>
+                            <tr>
+                                <td class="mr_monitor_frame_content_td1">Safety on:</td>
+                                <td class="mr_monitor_frame_content_td2" id="mr_monitor_cell_safety_on"></td>
+                            </tr>
+                        </table>
+                    </div>
                 </section>
 
                 <section id="tabs_content2"  class="tabs_sections">

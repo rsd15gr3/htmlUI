@@ -90,7 +90,7 @@
 /* Auto-manual control switch */
 .automanualswitch {
     position: relative;
-    margin-left: 300px;
+    margin-left: 70px;
     width: 160px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
@@ -99,7 +99,7 @@
 }
 .automanualswitch-label {
     display: block; overflow: hidden; cursor: pointer;
-    border: 2px solid #000000; border-radius: 8px;
+    border: 1px solid #aaa; border-radius: 8px;
 }
 .automanualswitch-inner {
     display: block; width: 200%; margin-left: -100%;
@@ -111,19 +111,19 @@
     box-sizing: border-box;
 }
 .automanualswitch-inner:before {
-    content: "AUTO Control";
+    content: "AUTOMODE";
     padding-left: 10px;
     background-color: #339CFF; color: #000000;
 }
 .automanualswitch-inner:after {
     content: "MANUAL Control";
     padding-right: 10px;
-    background-color: #EEEEEE; color: #000000;
+    background-color: #ddd; color: #000000;
     text-align: right;
 }
 .automanualswitch-switch {
-    display: block; width: 15px; margin: 7.5px;
-    background: #FFFFFF;
+    display: block; width: 10px; margin: 10px;
+    background: #000000;
     position: absolute; top: 0; bottom: 0;
     right: 126px;
     border: 2px solid #000000; border-radius: 8px;

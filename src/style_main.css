@@ -99,15 +99,19 @@ html {
 }
 
 #manual_control_frame {
-    height: 200px;
+    width: 300px;
+    height: 285px;
+    background-color: #eee;
     text-align: center;
     padding: 5px;
     margin: 10px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
 }
 
 #mc_button_up {
     position: absolute;
-    top: 150px;
+    top: 200px;
     left: 150px;
     width: 75px;
     height: 75px;
@@ -115,7 +119,7 @@ html {
 
 #mc_button_left {
     position: absolute;
-    top: 225px;
+    top: 275px;
     left: 75px;
     width: 75px;
     height: 75px;
@@ -123,7 +127,7 @@ html {
 
 #mc_button_right {
     position: absolute;
-    top: 225px;
+    top: 275px;
     left: 225px;
     width: 75px;
     height: 75px;
@@ -131,7 +135,7 @@ html {
 
 #mc_button_down {
     position: absolute;
-    top: 300px;
+    top: 350px;
     left: 150px;
     width: 75px;
     height: 75px;
@@ -139,8 +143,58 @@ html {
 
 #mc_button_stop {
     position: absolute;
-    top: 225px;
+    top: 275px;
     left: 150px;
     width: 75px;
     height: 75px;
+}
+
+#mr_monitor_frame {
+    position: absolute;
+    top: 125px;
+    left: 370px;
+    width: 370px;
+    height: 285px;
+    background-color: #eee;
+    text-align: center;
+    padding: 5px;
+    margin: 10px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+}
+
+#mr_monitor_frame_header {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 370px;
+    background-color: #ddd;
+    text-align: center;
+    padding: 5px;
+    border-bottom: 1px solid #bbb;
+}
+
+#mr_monitor_frame_content {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    width: 350px;
+    font-size: 12px;
+    text-align: left;
+    line-height: 1.5em;
+}
+
+.mr_monitor_frame_content_td1 {
+    width: 175px;
+    background-color: #ddd;
+    font-style: italic;
+    padding: 3px;
+}
+
+.mr_monitor_frame_content_td2 {
+    width: 175px;
+    background-color: #fff;
+    font-weight: bold;
+    text-align: center;
+    padding: 3px;
 }

@@ -12,7 +12,7 @@ html {
 	z-index: 30;
 	width: 100%;
 	height: 44px;
-    background-image: url(../img/bg_header.png);
+    background-image: url(./img/bg_header.png);
 	background-repeat: repeat-x;
 	background-color: Black;
     color: White;
@@ -109,44 +109,38 @@ html {
     border-radius: 5px;
 }
 
-#mc_button_up {
-    position: absolute;
-    top: 200px;
-    left: 150px;
-    width: 75px;
-    height: 75px;
+#joystick_container {
+    position: relative;
+    z-index: 100;
 }
 
-#mc_button_left {
-    position: absolute;
-    top: 275px;
-    left: 75px;
-    width: 75px;
-    height: 75px;
+#mc_speed_label_span {
+    position: relative;
+    top: 20px;
+    left: -35px;
+    font-size: 13px;
+    font-style: italic;
 }
 
-#mc_button_right {
-    position: absolute;
-    top: 275px;
-    left: 225px;
-    width: 75px;
-    height: 75px;
+#mc_speed_range {
+    position: relative;
+    top: 30px;
+    left: -10px;
 }
 
-#mc_button_down {
-    position: absolute;
-    top: 350px;
-    left: 150px;
-    width: 75px;
-    height: 75px;
+#mc_speed_value_span {
+    position: relative;
+    top: 30px;
+    left: 20px;
+    font-size: 20px;
+    font-weight: bold;
 }
 
-#mc_button_stop {
-    position: absolute;
-    top: 275px;
-    left: 150px;
-    width: 75px;
-    height: 75px;
+#fake_joystick {
+    visibility: hidden;
+    position: relative;
+    top: 110px;
+    left: 145px;
 }
 
 #mr_monitor_frame {

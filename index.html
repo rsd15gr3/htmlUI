@@ -13,10 +13,11 @@
         <script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
         <script src="jquery-1.11.3.js"></script>
         <script src="script.js"></script>
+        <script src="virtualjoystick.js"></script>
         <script type="text/javascript">
             // Connecting to ROS
             var ros = new ROSLIB.Ros({
-                url : 'ws://localhost:9090'
+                url : 'ws://10.125.7.210:9090'  // IP OF UI WEBSERVER with ROSBRIDGE
             });
 
             ros.on('connection', function() {
@@ -46,6 +47,16 @@
                 name : '/fmCommand/cmd_vel',
                 messageType : 'geometry_msgs/TwistStamped'
             });
+
+            // Mobile Robot velocities (linear and angular)
+            cmd_vel_topic.subscribe(function(message) {
+                document.getElementById("mr_monitor_cell_lin_vel").innerHTML = Math.round(message.twist.linear.x * 100) / 100;
+                document.getElementById("mr_monitor_cell_ang_vel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
+                //cmd_vel_topic.unsubscribe();
+            });
+
+            // Define joystick variable globally
+            var joystick;
 
         </script>
     </head>
@@ -92,11 +103,11 @@
                 </div>
             </div>
             <div id="tabs_frame">
-                <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" checked>
+                <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();" checked>
                 <label for="input_tab1" class="tabs_labels">Mobile robot</label>
-                <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs">
+                <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
                 <label for="input_tab2" class="tabs_labels">Workcell</label>
-                <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs">
+                <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
                 <label for="input_tab3" class="tabs_labels">General</label>
 
                 <section id="tabs_content1"  class="tabs_sections">
@@ -108,11 +119,16 @@
                                 <span class="automanualswitch-switch"></span>
                             </label>
                         </div>
-                        <input id="mc_button_up" type="image" src="../img/arrow_up.png" onclick="ros_btn_msg('forward');"/>
-                        <input id="mc_button_left" type="image" src="../img/arrow_left.png" onclick="ros_btn_msg('left');" />
-                        <input id="mc_button_right" type="image" src="../img/arrow_right.png" onclick="ros_btn_msg('right');" />
-                        <input id="mc_button_down" type="image" src="../img/arrow_down.png" onclick="ros_btn_msg('back');" />
-                        <input id="mc_button_stop" type="image" src="../img/stop.png" onclick="ros_btn_msg('stop');" />
+                        <span id="mc_speed_label_span">
+                            Speed:
+                        </span>
+                        <input id="mc_speed_range" type="range" min="0" max="0.5" value="0.3" step="0.1" onchange="mr_mc_speed_changed(this.value)" />
+                        <span id="mc_speed_value_span">
+                            0.3
+                        </span>
+                        <div id="fake_joystick">
+                            <!-- This is just to keep this position, real joystick_container below -->
+                        </div>
                     </div>
 
                     <div id="mr_monitor_frame">
@@ -156,6 +172,11 @@
                 <textarea id="textarea_console" rows="4" cols="95">
                 </textarea>
             </div>
+        </div>
+        <!-- The joystick needs to be relative to the body (page), as it reads mouse/touch positions on page -->
+        <div id="joystick_container">
+            <canvas id="joystick_base"></canvas>
+            <canvas id="joystick_stick"></canvas>
         </div>
     </body>
 </html>

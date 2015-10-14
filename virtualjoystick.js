@@ -144,24 +144,12 @@ VirtualJoystick.prototype._onUp	= function()
 {
 	this._pressed	= false; 
 	this._stickEl.style.display	= "none";
-	
-	if(this._stationaryBase == false){	
-		this._baseEl.style.display	= "none";
-	
-		this._baseX	= this._baseY	= 0;
-		this._stickX	= this._stickY	= 0;
-	}
+	ros_btn_msg('mr_stop');
 }
 
 VirtualJoystick.prototype._onDown	= function(x, y)
 {
-	this._pressed	= true; 
-	if(this._stationaryBase == false){
-		this._baseX	= x;
-		this._baseY	= y;
-		this._baseEl.style.display	= "";
-		this._move(this._baseEl.style, (this._baseX - this._baseEl.width /2), (this._baseY - this._baseEl.height/2));
-	}
+	this._pressed	= true;
 	
 	this._stickX	= x;
 	this._stickY	= y;
@@ -201,7 +189,7 @@ VirtualJoystick.prototype._onMove	= function(x, y)
 				this._stickY = stickNormalizedY * this._stickRadius + this._baseY;
 			} 		
 		}
-		
+		    joystick_moved(this._baseX, this._baseY, x, y);
         	this._move(this._stickEl.style, (this._stickX - this._stickEl.width /2), (this._stickY - this._stickEl.height/2));	
 	}
 }
@@ -370,7 +358,6 @@ VirtualJoystick.prototype._move = function(style, x, y)
 		style.left = x + 'px';
 		style.top = y + 'px';
 	}
-	joystick_moved(this._baseX, this._baseY, x, y);
 }
 
 VirtualJoystick.prototype._getTransformProperty = function() 

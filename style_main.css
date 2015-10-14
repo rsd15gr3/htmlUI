@@ -141,6 +141,8 @@ html {
     position: relative;
     top: 110px;
     left: 145px;
+    width: 10px;
+    height: 10px;
 }
 
 #mr_monitor_frame {

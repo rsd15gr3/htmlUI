@@ -2,7 +2,7 @@
 function on_loaded_page() {
     document.getElementById("onoff_frobit_sim").checked = 'checked'; // this how to set the button checked
 
-    $('#manual_control_frame').bind('keydown', function(event) {
+    $('#mr_manual_control_frame').bind('keydown', function(event) {
         switch(event.keyCode){
             case 37:
                 // left arrow
@@ -30,7 +30,7 @@ function on_loaded_page() {
             break;
         }
     });
-    document.getElementById('manual_control_frame').focus();
+    document.getElementById('mr_manual_control_frame').focus();
 
     put_joystick();
     to_console('Website loaded.')
@@ -133,7 +133,7 @@ function get_absolute_position_in_page(element) {
 
 /* Main menu : tab changed */
 function tabs_clicked() {
-    if (document.getElementById("input_tab1").checked) {
+    if (document.getElementById("input_tab2").checked) {
         document.getElementById("joystick_container").style.display = ""
     } else {
         document.getElementById("joystick_container").style.display = "none"

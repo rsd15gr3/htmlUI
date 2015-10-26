@@ -90,7 +90,8 @@ html {
 #input_tab1:checked ~ #tabs_content1,
 #input_tab2:checked ~ #tabs_content2,
 #input_tab3:checked ~ #tabs_content3,
-#input_tab4:checked ~ #tabs_content4 {
+#input_tab4:checked ~ #tabs_content4,
+#input_tab5:checked ~ #tabs_content5 {
   display: block;
 }
 
@@ -98,7 +99,22 @@ html {
     text-align: center;
 }
 
-#manual_control_frame {
+#net_monitor_frame_table {
+    position: relative;
+    top: 0px;
+    left: 150px;
+    background-color: #bbb;
+    width: 500px;
+    font-size: 12px;
+    text-align: left;
+    line-height: 1.5em;
+}
+
+#tabs_content2 {
+    text-align: center;
+}
+
+#mr_manual_control_frame {
     width: 300px;
     height: 285px;
     background-color: #eee;
@@ -170,27 +186,66 @@ html {
     border-bottom: 1px solid #bbb;
 }
 
-#mr_monitor_frame_content {
+#mr_monitor_frame_table {
     position: absolute;
     top: 40px;
     left: 10px;
+    background-color: #bbb;
     width: 350px;
     font-size: 12px;
     text-align: left;
     line-height: 1.5em;
 }
 
-.mr_monitor_frame_content_td1 {
+.monitor_frame_content_td1 {
     width: 175px;
     background-color: #ddd;
     font-style: italic;
     padding: 3px;
 }
 
-.mr_monitor_frame_content_td2 {
+.monitor_frame_content_td2 {
     width: 175px;
     background-color: #fff;
     font-weight: bold;
     text-align: center;
     padding: 3px;
+}
+
+#wc_monitor_frame {
+    position: relative;
+    left: 370px;
+    width: 370px;
+    background-color: #eee;
+    text-align: center;
+    border: 1px solid Black;
+}
+
+#wc_monitor_frame_header {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 370px;
+    background-color: #ddd;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#wc_monitor_frame_table {
+    position: relative;
+    top: 0px;
+    left: 10px;
+    background-color: #bbb;
+    width: 350px;
+    font-size: 12px;
+    text-align: left;
+    line-height: 1.5em;
+}
+
+#wc_monitor_usbcam_img {
+    position: relative;
+    width: 370px;
+    border-top: 1px solid Black;
+    border-bottom: 1px solid Black;
 }

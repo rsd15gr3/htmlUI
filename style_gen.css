@@ -63,29 +63,15 @@
     content: "Frobit";
 }
 
-#inner_onoff_frobit_sim:before {
-    content: "Frobit-sim";
+
+#inner_onoff_workcell:before {
+    content: "Workcell";
 }
 
-#inner_onoff_frobit_sim:after {
-    content: "Frobit-sim";
+#inner_onoff_workcell:after {
+    content: "Workcell";
 }
 
-#inner_onoff_kuka:before {
-    content: "Kuka";
-}
-
-#inner_onoff_kuka:after {
-    content: "Kuka";
-}
-
-#inner_onoff_kuka_sim:before {
-    content: "Kuka-sim";
-}
-
-#inner_onoff_kuka_sim:after {
-    content: "Kuka-sim";
-}
 
 /* Auto-manual control switch */
 .automanualswitch {

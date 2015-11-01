@@ -1,6 +1,5 @@
 /* Immediately when the site is refreshed this function is called */
 function on_loaded_page() {
-    document.getElementById("onoff_frobit_sim").checked = 'checked'; // this how to set the button checked
 
     $('#mr_manual_control_frame').bind('keydown', function(event) {
         switch(event.keyCode){
@@ -36,6 +35,115 @@ function on_loaded_page() {
     to_console('Website loaded.')
 }
 
+function init_ros() {
+    // Get IP of Frobit Ubuntu on SDU-GUEST
+    $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_frobit.txt')+'&callback=?',
+        function (data) {
+            console.log('Frobit IP: '+data.contents);
+            ip_frobit = data.contents;
+            init_ros_frobit();
+            document.getElementById('net_ip_frobit').innerHTML = ip_frobit;
+    });
+
+    // Get IP of Workcell Ubuntu on SDU-GUEST
+    $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_workcell.txt')+'&callback=?',
+        function (data) {
+            console.log('Workcell IP: '+data.contents);
+            ip_workcell = data.contents;
+            init_ros_workcell();
+            document.getElementById('net_ip_workcell').innerHTML = ip_workcell;
+    });
+}
+
+function init_ros_frobit() {
+    // Connecting to Frobit's ROSCORE using ROSBRIDGE
+    ros_frobit = new ROSLIB.Ros({
+        url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+    });
+
+    ros_frobit.on('connection', function() {
+        document.getElementById("onoff_frobit").checked = 'checked';
+        console.log('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
+        to_console('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
+    });
+
+    ros_frobit.on('error', function(error) {
+        console.log('Error connecting to Frobit\'s ROSCORE on '+ip_frobit+': ', error);
+        to_console('Error connecting to Frobit\'s ROSCORE on '+ip_frobit+'.');
+    });
+
+    ros_frobit.on('close', function() {
+        document.getElementById("onoff_frobit").checked = '';
+        console.log('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
+        to_console('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
+    });
+
+    // Topics on Frobit's ROSCORE
+    ui_mr_str_control_topic = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/ui_str_control',
+        messageType : 'std_msgs/String'
+    });
+
+    cmd_vel_topic = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/fmCommand/cmd_vel',
+        messageType : 'geometry_msgs/TwistStamped'
+    });
+
+    mr_usbcam_topic = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/usb_cam/image_raw/compressed',
+        messageType : 'sensor_msgs/CompressedImage'
+    });
+
+    // Mobile Robot velocities (linear and angular)
+    cmd_vel_topic.subscribe(function(message) {
+        document.getElementById("mr_monitor_cell_lin_vel").innerHTML = Math.round(message.twist.linear.x * 100) / 100;
+        document.getElementById("mr_monitor_cell_ang_vel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
+    });
+
+    // Image from MR usbcam
+    mr_usbcam_topic.subscribe(function(message) {
+        document.getElementById("mr_monitor_usbcam_img").src = "data:image/png;base64,"+message.data;
+    });
+}
+
+function init_ros_workcell() {
+    // Connecting to Workcell's ROSCORE using ROSBRIDGE
+    ros_workcell = new ROSLIB.Ros({
+        url : 'ws://'+ip_workcell+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+    });
+
+    ros_workcell.on('connection', function() {
+        document.getElementById("onoff_workcell").checked = 'checked';
+        console.log('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
+        to_console('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
+    });
+
+    ros_workcell.on('error', function(error) {
+        console.log('Error connecting to Workcell\'s ROSCORE on '+ip_workcell+': ', error);
+        to_console('Error connecting to Workcell\'s ROSCORE on '+ip_workcell+'.');
+    });
+
+    ros_workcell.on('close', function() {
+        document.getElementById("onoff_workcell").checked = '';
+        console.log('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
+        to_console('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
+    });
+
+    wc_usbcam_topic = new ROSLIB.Topic({
+        ros : ros_workcell,
+        name : '/usb_cam/image_raw/compressed',
+        messageType : 'sensor_msgs/CompressedImage'
+    });
+
+    // Image from WC usbcam
+    wc_usbcam_topic.subscribe(function(message) {
+        document.getElementById("wc_monitor_usbcam_img").src = "data:image/png;base64,"+message.data;
+    });
+}
+
 /* Show text in self-created console in our UI */
 function to_console(text) {
     var ta = document.getElementById('textarea_console');
@@ -46,7 +154,7 @@ function to_console(text) {
 /* Publish control to the topic */
 function ros_btn_msg(data_str) {
     var msg = new ROSLIB.Message({data : data_str})
-    ui_str_control_topic.publish(msg);
+    ui_mr_str_control_topic.publish(msg);
     console.log(msg)
 }
 

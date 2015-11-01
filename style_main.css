@@ -246,6 +246,18 @@ html {
 #wc_monitor_usbcam_img {
     position: relative;
     width: 370px;
+    font-size: 10px;
+    font-variant: italic;
     border-top: 1px solid Black;
     border-bottom: 1px solid Black;
+}
+
+#mr_monitor_usbcam_img {
+    position: absolute;
+    top: 180px;
+    left: 5px;
+    width: 370px;
+    font-size: 10px;
+    font-variant: italic;
+    border: 1px solid Black;
 }

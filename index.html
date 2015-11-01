@@ -15,60 +15,24 @@
         <script src="script.js"></script>
         <script src="virtualjoystick.js"></script>
         <script type="text/javascript">
-            // Connecting to ROS
-            var ros = new ROSLIB.Ros({
-                //url : 'ws://localhost:9090'
-                url : 'ws://10.125.7.82:9090'  // IP OF UI WEBSERVER with ROSBRIDGE
-            });
-
-            ros.on('connection', function() {
-                console.log('Connected to websocket server.');
-                to_console('Connected to websocket server.');
-            });
-
-            ros.on('error', function(error) {
-                console.log('Error connecting to websocket server: ', error);
-                to_console('Error connecting to websocket server.');
-            });
-
-            ros.on('close', function() {
-                console.log('Connection to websocket server closed.');
-                to_console('Connection to websocket server closed.');
-            });
-
-            // Topics
-            var ui_str_control_topic = new ROSLIB.Topic({
-                ros : ros,
-                name : '/ui_str_control',
-                messageType : 'std_msgs/String'
-            });
-
-            var cmd_vel_topic = new ROSLIB.Topic({
-                ros : ros,
-                name : '/fmCommand/cmd_vel',
-                messageType : 'geometry_msgs/TwistStamped'
-            });
-
-            var wc_usbcam_topic = new ROSLIB.Topic({
-                ros : ros,
-                name : '/usb_cam/image_raw/compressed',
-                messageType : 'sensor_msgs/CompressedImage'
-            });
-
-            // Mobile Robot velocities (linear and angular)
-            cmd_vel_topic.subscribe(function(message) {
-                document.getElementById("mr_monitor_cell_lin_vel").innerHTML = Math.round(message.twist.linear.x * 100) / 100;
-                document.getElementById("mr_monitor_cell_ang_vel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
-            });
-
-            // Image from WC usbcam
-            wc_usbcam_topic.subscribe(function(message) {
-                document.getElementById("wc_monitor_usbcam_img").src = "data:image/png;base64,"+message.data;
-            });
-            //ros.callService('/rosjs/subscribe',(['/usb_cam/image_raw/compressed',0,'png',370,370,100]),function(rsp) {console('on it '+rsp)});
-
-            // Define joystick variable globally
+            /* ---------------- Define global variables --------------------- */
             var joystick;
+            var ip_frobit;
+            var ip_workcell;
+
+            // ROS cores
+            var ros_frobit;
+            var ros_workcell;
+
+            // Topics on Frobit
+            var ui_mr_str_control_topic;
+            var cmd_vel_topic;
+            var mr_usbcam_topic;
+
+            // Topics on Workcell
+            var wc_usbcam_topic;
+
+            init_ros();
 
         </script>
     </head>
@@ -93,23 +57,9 @@
                     </label>
                 </div>
                 <div class="onoffswitch">
-                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_frobit_sim" disabled>
-                    <label class="onoffswitch-label" for="onoff_frobit_sim">
-                        <span id="inner_onoff_frobit_sim" class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
-                <div class="onoffswitch">
-                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_kuka" disabled>
-                    <label class="onoffswitch-label" for="onoff_kuka">
-                        <span id="inner_onoff_kuka" class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
-                <div class="onoffswitch">
-                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_kuka_sim" disabled>
-                    <label class="onoffswitch-label" for="onoff_kuka_sim">
-                        <span id="inner_onoff_kuka_sim" class="onoffswitch-inner"></span>
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoff_workcell" disabled>
+                    <label class="onoffswitch-label" for="onoff_workcell">
+                        <span id="inner_onoff_workcell" class="onoffswitch-inner"></span>
                         <span class="onoffswitch-switch"></span>
                     </label>
                 </div>
@@ -133,20 +83,12 @@
                             <td class="monitor_frame_content_td2" id="net_netused">SDU-GUEST</td>
                         </tr>
                         <tr>
-                            <td class="monitor_frame_content_td1">master:</td>
-                            <td class="monitor_frame_content_td2" id="net_ip_master">IP_MASTER</td>
-                        </tr>
-                        <tr>
-                            <td class="monitor_frame_content_td1">webserver:</td>
-                            <td class="monitor_frame_content_td2" id="net_ip_webserver">IP_WEBSERVER</td>
-                        </tr>
-                        <tr>
                             <td class="monitor_frame_content_td1">frobit:</td>
-                            <td class="monitor_frame_content_td2" id="net_ip_frobit">IP_FROBIT</td>
+                            <td class="monitor_frame_content_td2" id="net_ip_frobit"></td>
                         </tr>
                         <tr>
                             <td class="monitor_frame_content_td1">workcell:</td>
-                            <td class="monitor_frame_content_td2" id="net_ip_workcell">IP_WORKCELL</td>
+                            <td class="monitor_frame_content_td2" id="net_ip_workcell"></td>
                         </tr>
                     </table>
                 </section>
@@ -172,7 +114,7 @@
 
                     <div id="mr_monitor_frame">
                         <div id="mr_monitor_frame_header">
-                            MR Online Monitor
+                            Frobit Online Monitor
                         </div>
                         <table id="mr_monitor_frame_table">
                             <tr>
@@ -196,6 +138,7 @@
                                 <td class="monitor_frame_content_td2" id="mr_monitor_cell_safety_on"></td>
                             </tr>
                         </table>
+                        <img id="mr_monitor_usbcam_img" alt="Camera node on Frobit is not ready"/>
                     </div>
                 </section>
 
@@ -217,12 +160,12 @@
                                 <td class="monitor_frame_content_td2" id="wc_monitor_cell_mission"></td>
                             </tr>
                         </table>
-                        <img id="wc_monitor_usbcam_img" />
+                        <img id="wc_monitor_usbcam_img" alt="Camera node on Workcell is not ready"/>
                     </div>
                 </section>
 
                 <section id="tabs_content4"  class="tabs_sections">
-                    Conveyor belt controlled with PLC
+                    Conveyor belt controlled with PLC<br />
                 </section>
 
                 <section id="tabs_content5"  class="tabs_sections">

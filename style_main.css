@@ -91,7 +91,8 @@ html {
 #input_tab2:checked ~ #tabs_content2,
 #input_tab3:checked ~ #tabs_content3,
 #input_tab4:checked ~ #tabs_content4,
-#input_tab5:checked ~ #tabs_content5 {
+#input_tab5:checked ~ #tabs_content5,
+#input_tab6:checked ~ #tabs_content6 {
   display: block;
 }
 
@@ -166,32 +167,29 @@ html {
     top: 125px;
     left: 370px;
     width: 370px;
-    height: 285px;
     background-color: #eee;
     text-align: center;
-    padding: 5px;
     margin: 10px;
     border: 1px solid #bbb;
     border-radius: 5px;
 }
 
 #mr_monitor_frame_header {
-    position: absolute;
+    position: relative;
     top: 0px;
     left: 0px;
     width: 370px;
     background-color: #ddd;
     text-align: center;
-    padding: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     border-bottom: 1px solid #bbb;
 }
 
 #mr_monitor_frame_table {
-    position: absolute;
-    top: 40px;
-    left: 10px;
+    position: relative;
     background-color: #bbb;
-    width: 350px;
+    width: 370px;
     font-size: 12px;
     text-align: left;
     line-height: 1.5em;
@@ -213,12 +211,15 @@ html {
 }
 
 #wc_monitor_frame {
-    position: relative;
-    left: 370px;
+    position: absolute;
+    top: 125px;
+    left: 380px;
     width: 370px;
     background-color: #eee;
     text-align: center;
-    border: 1px solid Black;
+    margin: 10px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
 }
 
 #wc_monitor_frame_header {
@@ -230,34 +231,100 @@ html {
     text-align: center;
     padding-top: 5px;
     padding-bottom: 5px;
+    border-bottom: 1px solid #bbb;
 }
 
 #wc_monitor_frame_table {
     position: relative;
-    top: 0px;
-    left: 10px;
     background-color: #bbb;
-    width: 350px;
+    width: 370px;
     font-size: 12px;
     text-align: left;
     line-height: 1.5em;
 }
 
-#wc_monitor_usbcam_img {
+#wc_manual_control_frame {
     position: relative;
-    width: 370px;
-    font-size: 10px;
-    font-variant: italic;
-    border-top: 1px solid Black;
-    border-bottom: 1px solid Black;
+    top: 15px;
+    width: 300px;
+    background-color: #eee;
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
 }
 
-#mr_monitor_usbcam_img {
-    position: absolute;
-    top: 180px;
-    left: 5px;
+#wc_mc_table {
+    position: relative;
+    top: 15px;
+    width: 300px;
+    background-color: White;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+table#wc_mc_table th {
+    width: 100px;
+    font-size: 11px;
+}
+
+.wc_mc_table_button {
+    width: 40px;
+}
+
+.wc_mc_table_value {
+    width: 30px;
+}
+
+.wc_mc_table_slider {
+    width: 80px;
+    border: 1px solid Red;
+}
+
+#wc_monitor_usbcam_img {
     width: 370px;
     font-size: 10px;
     font-variant: italic;
     border: 1px solid Black;
+}
+
+#mr_monitor_usbcam_img {
+    width: 370px;
+    font-size: 10px;
+    font-variant: italic;
+    border: 1px solid Black;
+}
+
+#cameras_table {
+    width: 760px;
+    background-color: #eee;
+}
+
+table#cameras_table th {
+    font-size: 13px;
+    font-variant: small-caps;
+}
+
+table#cameras_table td {
+    width: 370px;
+    background-color: White;
+    font-size: 11px;
+    line-weight: 1.7em;
+}
+
+#ros_structure_table {
+    width: 760px;
+    background-color: #eee;
+}
+
+table#ros_structure_table th {
+    font-size: 13px;
+    font-variant: small-caps;
+}
+
+table#ros_structure_table td {
+    width: 370px;
+    background-color: White;
+    font-size: 11px;
+    line-weight: 1.7em;
 }

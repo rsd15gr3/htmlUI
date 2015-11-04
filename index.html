@@ -27,10 +27,17 @@
             // Topics on Frobit
             var ui_mr_str_control_topic;
             var cmd_vel_topic;
+            var control_mode_frobit_topic;
             var mr_usbcam_topic;
 
             // Topics on Workcell
             var wc_usbcam_topic;
+
+            // Monitoring ros structures
+            var topics_client_frobit;
+            var topics_client_workcell;
+            var nodes_client_frobit;
+            var nodes_client_workcell;
 
             init_ros();
 
@@ -66,34 +73,19 @@
             </div>
             <div id="tabs_frame">
                 <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();" checked>
-                <label for="input_tab1" class="tabs_labels">Network</label>
-                <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();" checked>
-                <label for="input_tab2" class="tabs_labels">Mobile Robot</label>
+                <label for="input_tab1" class="tabs_labels">Frobit</label>
+                <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
+                <label for="input_tab2" class="tabs_labels">Workcell</label>
                 <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
-                <label for="input_tab3" class="tabs_labels">Workcell</label>
+                <label for="input_tab3" class="tabs_labels">Tipper</label>
                 <input id="input_tab4" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
-                <label for="input_tab4" class="tabs_labels">Conveyor Belt</label>
+                <label for="input_tab4" class="tabs_labels">Belt</label>
                 <input id="input_tab5" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
-                <label for="input_tab5" class="tabs_labels">Central Monitor</label>
+                <label for="input_tab5" class="tabs_labels">Cameras</label>
+                <input id="input_tab6" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
+                <label for="input_tab6" class="tabs_labels">ROS</label>
 
                 <section id="tabs_content1"  class="tabs_sections">
-                    <table id="net_monitor_frame_table">
-                        <tr>
-                            <td class="monitor_frame_content_td1">Network SSID:</td>
-                            <td class="monitor_frame_content_td2" id="net_netused">SDU-GUEST</td>
-                        </tr>
-                        <tr>
-                            <td class="monitor_frame_content_td1">frobit:</td>
-                            <td class="monitor_frame_content_td2" id="net_ip_frobit"></td>
-                        </tr>
-                        <tr>
-                            <td class="monitor_frame_content_td1">workcell:</td>
-                            <td class="monitor_frame_content_td2" id="net_ip_workcell"></td>
-                        </tr>
-                    </table>
-                </section>
-
-                <section id="tabs_content2"  class="tabs_sections">
                     <div id="mr_manual_control_frame" tabindex="0">
                          <div class="automanualswitch">
                             <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();">
@@ -102,11 +94,6 @@
                                 <span class="automanualswitch-switch"></span>
                             </label>
                         </div>
-                        <!--<span id="mc_speed_label_span"> Speed: </span>
-                        <input id="mc_speed_range" type="range" min="0" max="0.5" value="0.3" step="0.1" onchange="mr_mc_speed_changed(this.value)" />
-                        <span id="mc_speed_value_span">
-                            0.3
-                        </span>-->
                         <div id="fake_joystick">
                             <!-- This is just to keep this position, real joystick_container below -->
                         </div>
@@ -118,8 +105,20 @@
                         </div>
                         <table id="mr_monitor_frame_table">
                             <tr>
-                                <td class="monitor_frame_content_td1">Mode:</td>
+                                <td class="monitor_frame_content_td1">Connection:</td>
+                                <td class="monitor_frame_content_td2" id="mr_net_ip"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Control Mode [auto/man]:</td>
                                 <td class="monitor_frame_content_td2" id="mr_monitor_cell_mode"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">State (mission):</td>
+                                <td class="monitor_frame_content_td2" id="mr_monitor_state"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Position On Map:</td>
+                                <td class="monitor_frame_content_td2" id="mr_monitor_position"></td>
                             </tr>
                             <tr>
                                 <td class="monitor_frame_content_td1">Linear velocity:</td>
@@ -129,22 +128,161 @@
                                 <td class="monitor_frame_content_td1">Angular velocity:</td>
                                 <td class="monitor_frame_content_td2" id="mr_monitor_cell_ang_vel"></td>
                             </tr>
-                            <tr>
-                                <td class="monitor_frame_content_td1">Mission:</td>
-                                <td class="monitor_frame_content_td2" id="mr_monitor_cell_mission"></td>
-                            </tr>
-                            <tr>
-                                <td class="monitor_frame_content_td1">Safety on:</td>
-                                <td class="monitor_frame_content_td2" id="mr_monitor_cell_safety_on"></td>
-                            </tr>
                         </table>
-                        <img id="mr_monitor_usbcam_img" alt="Camera node on Frobit is not ready"/>
                     </div>
                 </section>
 
-                <section id="tabs_content3"  class="tabs_sections">
-                    <div id="wc_manual_control_frame" tabindex="0">
-                        <!-- Manual control for Kuka's 7 joints might be here -->
+                <section id="tabs_content2"  class="tabs_sections">
+                    <div id="wc_manual_control_frame">
+                        <div class="automanualswitch">
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="wc_man_auto_switch" onclick="wc_man_auto_changed();">
+                            <label class="automanualswitch-label" for="wc_man_auto_switch">
+                                <span class="automanualswitch-inner"></span>
+                                <span class="automanualswitch-switch"></span>
+                            </label>
+                        </div>
+                        <table id="wc_mc_table" cellspacing="5">
+                            <tr>
+                                <th>
+                                    j0
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_j0"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    j1
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_j1"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    j2
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_j2"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    j3
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_j3"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    j4
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_j4"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    j5
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_j5"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    G
+                                </th>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="-"/>
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input id="wc_mc_slider_g"  class="wc_mc_table_slider" type="range" step="0.1" onchange="wc_mc_changed(this, this.value)" disabled />
+                                </td>
+                                <td class="wc_mc_table_value">
+                                    ?.?
+                                </td>
+                                <td>
+                                    <input class="wc_mc_table_button" type="button" value="+"/>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div id="wc_monitor_frame">
                         <div id="wc_monitor_frame_header">
@@ -152,24 +290,104 @@
                         </div>
                         <table id="wc_monitor_frame_table">
                             <tr>
-                                <td class="monitor_frame_content_td1">Mode:</td>
-                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_mode">Automode</td>
+                                <td class="monitor_frame_content_td1">Connection:</td>
+                                <td class="monitor_frame_content_td2" id="wc_net_ip"></td>
                             </tr>
                             <tr>
-                                <td class="monitor_frame_content_td1">Mission:</td>
+                                <td class="monitor_frame_content_td1">Control Mode [auto/man]:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_mode"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">State (mission):</td>
                                 <td class="monitor_frame_content_td2" id="wc_monitor_cell_mission"></td>
                             </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Joint 0:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_j0"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Joint 1:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_j1"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Joint 2:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_j2"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Joint 3:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_j3"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Joint 4:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_j4"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Joint 5:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_j5"></td>
+                            </tr>
+                            <tr>
+                                <td class="monitor_frame_content_td1">Gripper:</td>
+                                <td class="monitor_frame_content_td2" id="wc_monitor_cell_gripper"></td>
+                            </tr>
                         </table>
-                        <img id="wc_monitor_usbcam_img" alt="Camera node on Workcell is not ready"/>
                     </div>
                 </section>
 
+                <section id="tabs_content3"  class="tabs_sections">
+                    tipper
+                </section>
+
                 <section id="tabs_content4"  class="tabs_sections">
-                    Conveyor belt controlled with PLC<br />
+                    belt
                 </section>
 
                 <section id="tabs_content5"  class="tabs_sections">
-                    A 'Fancy' visualization might be here
+                    <table id="cameras_table" cellspacing="5">
+                        <tr>
+                            <th>Frobit's USB Camera</th>
+
+                            <th>Workcell's USB Camera</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img id="mr_monitor_usbcam_img" alt="Camera node on Frobit is not ready"/>
+                            </td>
+                            <td>
+                                <img id="wc_monitor_usbcam_img" alt="Camera node on Workcell is not ready"/>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section id="tabs_content6"  class="tabs_sections">
+                    <table id="ros_structure_table" cellspacing="5" cellpadding="5">
+                        <tr>
+                            <th>Frobit's Topics</th>
+
+                            <th>Workcell's Topics</th>
+                        </tr>
+                        <tr>
+                            <td id="mr_ros_structure_topics">
+                                &nbsp;
+                            </td>
+                            <td id="wc_ros_structure_topics">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Frobit's Active Nodes</th>
+
+                            <th>Workcell's Active Nodes</th>
+                        </tr>
+                        <tr>
+                            <td id="mr_ros_structure_nodes">
+                                &nbsp;
+                            </td>
+                            <td id="wc_ros_structure_nodes">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </table>
                 </section>
             </div>
             <div id="console_frame">

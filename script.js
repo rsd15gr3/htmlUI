@@ -32,6 +32,7 @@ function on_loaded_page() {
     document.getElementById('mr_manual_control_frame').focus();
 
     put_joystick();
+    setInterval(update_ros_structure, 1000);    // Update ROS Structure Monitor every 1s
     to_console('Website loaded.')
 }
 
@@ -42,7 +43,7 @@ function init_ros() {
             console.log('Frobit IP: '+data.contents);
             ip_frobit = data.contents;
             init_ros_frobit();
-            document.getElementById('net_ip_frobit').innerHTML = ip_frobit;
+            document.getElementById('mr_net_ip').innerHTML = ip_frobit;
     });
 
     // Get IP of Workcell Ubuntu on SDU-GUEST
@@ -51,18 +52,20 @@ function init_ros() {
             console.log('Workcell IP: '+data.contents);
             ip_workcell = data.contents;
             init_ros_workcell();
-            document.getElementById('net_ip_workcell').innerHTML = ip_workcell;
+            document.getElementById('wc_net_ip').innerHTML = ip_workcell;
     });
 }
 
 function init_ros_frobit() {
     // Connecting to Frobit's ROSCORE using ROSBRIDGE
     ros_frobit = new ROSLIB.Ros({
-        url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        url : 'ws://localhost:9090'   // For testing on my computer
+        //url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_frobit.on('connection', function() {
         document.getElementById("onoff_frobit").checked = 'checked';
+        document.getElementById("mr_net_ip").style.backgroundColor = 'LightGreen';
         console.log('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
         to_console('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
     });
@@ -74,6 +77,7 @@ function init_ros_frobit() {
 
     ros_frobit.on('close', function() {
         document.getElementById("onoff_frobit").checked = '';
+        document.getElementById("mr_net_ip").style.backgroundColor = 'Red';
         console.log('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
         to_console('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
     });
@@ -91,6 +95,12 @@ function init_ros_frobit() {
         messageType : 'geometry_msgs/TwistStamped'
     });
 
+    control_mode_frobit_topic = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/fmPlan/automode',
+        messageType : 'msgs/IntStamped'
+    });
+
     mr_usbcam_topic = new ROSLIB.Topic({
         ros : ros_frobit,
         name : '/usb_cam/image_raw/compressed',
@@ -103,9 +113,34 @@ function init_ros_frobit() {
         document.getElementById("mr_monitor_cell_ang_vel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
     });
 
+    // Mobile Robot control mode
+    control_mode_frobit_topic.subscribe(function(message) {
+        if (message.data == 1) {
+            document.getElementById("mr_monitor_cell_mode").innerHTML = 'Automode';
+        } else if (message.data == 0) {
+            document.getElementById("mr_monitor_cell_mode").innerHTML = 'Manual control';
+        } else {
+            document.getElementById("mr_monitor_cell_mode").innerHTML = 'Not published yet';
+        }
+
+    });
+
     // Image from MR usbcam
     mr_usbcam_topic.subscribe(function(message) {
         document.getElementById("mr_monitor_usbcam_img").src = "data:image/png;base64,"+message.data;
+    });
+
+    // Monitoring ROS structure
+    topics_client_frobit = new ROSLIB.Service({
+        ros : ros_frobit,
+        name : '/rosapi/topics',
+        serviceType : 'rosapi/Topics'
+    });
+
+    nodes_client_frobit = new ROSLIB.Service({
+        ros : ros_frobit,
+        name : '/rosapi/nodes',
+        serviceType : 'rosapi/Nodes'
     });
 }
 
@@ -117,6 +152,7 @@ function init_ros_workcell() {
 
     ros_workcell.on('connection', function() {
         document.getElementById("onoff_workcell").checked = 'checked';
+        document.getElementById("wc_net_ip").style.backgroundColor = 'LightGreen';
         console.log('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
         to_console('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
     });
@@ -128,6 +164,7 @@ function init_ros_workcell() {
 
     ros_workcell.on('close', function() {
         document.getElementById("onoff_workcell").checked = '';
+        document.getElementById("wc_net_ip").style.backgroundColor = 'Red';
         console.log('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
         to_console('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
     });
@@ -142,7 +179,61 @@ function init_ros_workcell() {
     wc_usbcam_topic.subscribe(function(message) {
         document.getElementById("wc_monitor_usbcam_img").src = "data:image/png;base64,"+message.data;
     });
+
+    // Monitoring ROS structure
+    topics_client_workcell = new ROSLIB.Service({
+        ros : ros_workcell,
+        name : '/rosapi/topics',
+        serviceType : 'rosapi/Topics'
+    });
+
+    nodes_client_workcell = new ROSLIB.Service({
+        ros : ros_workcell,
+        name : '/rosapi/nodes',
+        serviceType : 'rosapi/Nodes'
+    });
 }
+
+/* This function is being run in a loop, it monitors ROS structures*/
+function update_ros_structure() {
+    try {
+        topics_client_frobit.callService(new ROSLIB.ServiceRequest(), function(result) {
+            var topics_frobit_str = '';
+            for (var i in result.topics) {
+              topics_frobit_str += result.topics[i]+'<br />';
+            }
+            document.getElementById('mr_ros_structure_topics').innerHTML = topics_frobit_str;
+        });
+        nodes_client_frobit.callService(new ROSLIB.ServiceRequest(), function(result) {
+            var nodes_frobit_str = '';
+            for (var i in result.nodes) {
+              nodes_frobit_str += result.nodes[i]+'<br />';
+            }
+            document.getElementById('mr_ros_structure_nodes').innerHTML = nodes_frobit_str;
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+
+    try {
+        topics_client_workcell.callService(new ROSLIB.ServiceRequest(), function(result) {
+            var topics_workcell_str = '';
+            for (var i in result.topics) {
+              topics_workcell_str += result.topics[i]+'<br />';
+            }
+            document.getElementById('wc_ros_structure_topics').innerHTML = topics_workcell_str;
+        });
+        nodes_client_workcell.callService(new ROSLIB.ServiceRequest(), function(result) {
+            var nodes_workcell_str = '';
+            for (var i in result.nodes) {
+              nodes_workcell_str += result.nodes[i]+'<br />';
+            }
+            document.getElementById('wc_ros_structure_nodes').innerHTML = nodes_workcell_str;
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+};
 
 /* Show text in self-created console in our UI */
 function to_console(text) {
@@ -241,7 +332,7 @@ function get_absolute_position_in_page(element) {
 
 /* Main menu : tab changed */
 function tabs_clicked() {
-    if (document.getElementById("input_tab2").checked) {
+    if (document.getElementById("input_tab1").checked) {
         document.getElementById("joystick_container").style.display = ""
     } else {
         document.getElementById("joystick_container").style.display = "none"
@@ -261,8 +352,7 @@ function joystick_moved(x0, y0, x, y) {
 }
 
 /* Manual control of the mobile robot : Speed changed */
-function mr_mc_speed_changed(value) {
+function wc_mc_changed(slider, value) {
     value==0?value="0.0":{};
-    document.getElementById("mc_speed_value_span").innerHTML = value;
-    ros_btn_msg('mr_speed;'+value);
+    document.getElementById("wc_monitor_cell_j0").innerHTML = value;
 }

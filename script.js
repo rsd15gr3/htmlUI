@@ -59,8 +59,8 @@ function init_ros() {
 function init_ros_frobit() {
     // Connecting to Frobit's ROSCORE using ROSBRIDGE
     ros_frobit = new ROSLIB.Ros({
-        url : 'ws://localhost:9090'   // For testing on my computer
-        //url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        //url : 'ws://localhost:9090'   // For testing on my computer
+        url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_frobit.on('connection', function() {

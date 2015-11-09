@@ -1,7 +1,48 @@
-/* Main control line : systems ready? (Might be written better : TODO) */
+/* --------------------------------- Tabs -------------------------------------------------------------- */
+.tabs_sections {
+  display: none;
+  font-size: 14px;
+  padding: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.tabs_inputs {
+  display: none;
+}
+
+.tabs_labels {
+  display: inline-block;
+  color: #555;
+  text-align: center;
+  padding: 15px 25px;
+  border: 1px solid transparent;
+}
+
+.tabs_labels:hover {
+  color: DarkBlue;
+  cursor: pointer;
+}
+
+.tabs_inputs:checked + .tabs_labels {
+  color: Black;
+  border: 0px solid #ddd;
+  border-top: 3px solid DarkBlue;
+  border-bottom: 1px solid #fff;
+}
+
+#input_tab1:checked ~ #tabs_content1,
+#input_tab2:checked ~ #tabs_content2,
+#input_tab3:checked ~ #tabs_content3,
+#input_tab4:checked ~ #tabs_content4,
+#input_tab5:checked ~ #tabs_content5,
+#input_tab6:checked ~ #tabs_content6 {
+  display: block;
+}
+
+/* ------------------------------------- Connection Indicators : On/Off Switches ---------------------------------- */
 .onoffswitch {
     position: relative;
-    width: 110px;
+    width: 150px;
     float: left;
     margin: 10px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
@@ -11,7 +52,7 @@
 }
 .onoffswitch-label {
     display: block; overflow: hidden; cursor: help;
-    border: 2px solid DarkGreen; border-radius: 5px;
+    border: 2px solid Black; border-radius: 5px;
 }
 
 .onoffswitch-inner {
@@ -29,14 +70,14 @@
 }
 .onoffswitch-inner:after {
     padding-right: 13px;
-    background-color: #ccc; color: #000000;
+    background-color: #F5BCA9; color: #000000;
     text-align: right;
 }
 .onoffswitch-switch {
     display: block; width: 10px; margin: 7.5px;
     background: #FFFFFF;
     position: absolute; top: 0; bottom: 0;
-    right: 80px;
+    right: 120px;
     border: 2px solid #999999; border-radius: 5px;
     transition: all 0.3s ease-in 0s;
 }
@@ -56,20 +97,20 @@
 }
 
 #inner_onoff_frobit:before {
-    content: "Frobit";
+    content: "Frobit CORE";
 }
 
 #inner_onoff_frobit:after {
-    content: "Frobit";
+    content: "Frobit CORE";
 }
 
 
 #inner_onoff_workcell:before {
-    content: "Workcell";
+    content: "Workcell CORE";
 }
 
 #inner_onoff_workcell:after {
-    content: "Workcell";
+    content: "Workcell CORE";
 }
 
 
@@ -119,5 +160,56 @@
     margin-left: 0;
 }
 .automanualswitch-checkbox:checked + .automanualswitch-label .automanualswitch-switch {
+    right: 0px;
+}
+
+/* Belt turned manually on/off : switch */
+.beltonoffswitch {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 110px;
+    width: 80px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.beltonoffswitch-checkbox {
+    display: none;
+}
+.beltonoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 1px solid #aaa; border-radius: 8px;
+}
+.beltonoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.beltonoffswitch-inner:before, .beltonoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.beltonoffswitch-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    text-align: left;
+    background-color: #3ADF00; color: #000000;
+}
+.beltonoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #DF0101; color: #000000;
+    text-align: right;
+}
+.beltonoffswitch-switch {
+    display: block; width: 10px; margin: 10px;
+    background: #000000;
+    position: absolute; top: 0; bottom: 0;
+    right: 50px;
+    border: 2px solid #000000; border-radius: 8px;
+    transition: all 0.3s ease-in 0s;
+}
+.beltonoffswitch-checkbox:checked + .beltonoffswitch-label .beltonoffswitch-inner {
+    margin-left: 0;
+}
+.beltonoffswitch-checkbox:checked + .beltonoffswitch-label .beltonoffswitch-switch {
     right: 0px;
 }

@@ -5,16 +5,23 @@ html {
     font-family: fontawesome;
 }
 
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    padding: 0 5px;
+}
+
 #header {
     position: absolute;
-	top: 0px;
-	left: 0px;
-	z-index: 30;
-	width: 100%;
-	height: 44px;
+    top: 0px;
+    left: 0px;
+    z-index: 30;
+    width: 100%;
+    height: 44px;
     background-image: url(./img/bg_header.png);
-	background-repeat: repeat-x;
-	background-color: Black;
+    background-repeat: repeat-x;
+    background-color: Black;
     color: White;
     font-size: 25px;
     font-weight: bold;
@@ -22,102 +29,26 @@ html {
     line-height: 1.7em;
 }
 
-#ui_frame {
-	position: absolute;
-	top: 44px;
-	left: 0;
-	right: 0;
-	z-index: 100;
-	width: 800px;
-	background-color: White;
-	margin: auto;
-	border: 1px solid DarkGray;
+#main_frame {
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    width: 800px;
+    background-color: White;
+    margin: auto;
+    border: 1px solid DarkGray;
 }
 
-#main_control_line {
+#connection_indicator_frame {
     height: 50px;
     background-color: #eee;
 }
 
-#console_frame {
-    background-color: #eee;
-    text-align: center;
-    border-top: 1px solid #ccc;
-}
-
-#textarea_console {
-    background-color: transparent;
-    font-size: 13px;
-    font-family: Courier;
-    text-align: left;
-    line-height: 1.3em;
-    margin: 5px;
-    border: 0px;
-}
-
-/* Tabs */
-.tabs_sections {
-  display: none;
-  font-size: 14px;
-  padding: 20px;
-  border-top: 1px solid #ddd;
-}
-
-.tabs_inputs {
-  display: none;
-}
-
-.tabs_labels {
-  display: inline-block;
-  color: #555;
-  text-align: center;
-  padding: 15px 25px;
-  border: 1px solid transparent;
-}
-
-.tabs_labels:hover {
-  color: DarkBlue;
-  cursor: pointer;
-}
-
-.tabs_inputs:checked + .tabs_labels {
-  color: Black;
-  border: 0px solid #ddd;
-  border-top: 3px solid DarkBlue;
-  border-bottom: 1px solid #fff;
-}
-
-#input_tab1:checked ~ #tabs_content1,
-#input_tab2:checked ~ #tabs_content2,
-#input_tab3:checked ~ #tabs_content3,
-#input_tab4:checked ~ #tabs_content4,
-#input_tab5:checked ~ #tabs_content5,
-#input_tab6:checked ~ #tabs_content6 {
-  display: block;
-}
-
-#tabs_content1 {
-    text-align: center;
-}
-
-#net_monitor_frame_table {
-    position: relative;
-    top: 0px;
-    left: 150px;
-    background-color: #bbb;
-    width: 500px;
-    font-size: 12px;
-    text-align: left;
-    line-height: 1.5em;
-}
-
-#tabs_content2 {
-    text-align: center;
-}
-
-#mr_manual_control_frame {
+/* --------------------------------------- Common classes ------------------------------------- */
+.control_frame {
     width: 300px;
-    height: 285px;
     background-color: #eee;
     text-align: center;
     padding: 5px;
@@ -126,43 +57,7 @@ html {
     border-radius: 5px;
 }
 
-#joystick_container {
-    position: relative;
-    z-index: 100;
-}
-
-#mc_speed_label_span {
-    position: relative;
-    top: 20px;
-    left: -35px;
-    font-size: 13px;
-    font-style: italic;
-}
-
-#mc_speed_range {
-    position: relative;
-    top: 30px;
-    left: -10px;
-}
-
-#mc_speed_value_span {
-    position: relative;
-    top: 30px;
-    left: 20px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-#fake_joystick {
-    visibility: hidden;
-    position: relative;
-    top: 110px;
-    left: 145px;
-    width: 10px;
-    height: 10px;
-}
-
-#mr_monitor_frame {
+.monitor_frame {
     position: absolute;
     top: 125px;
     left: 370px;
@@ -174,7 +69,7 @@ html {
     border-radius: 5px;
 }
 
-#mr_monitor_frame_header {
+.monitor_frame_header {
     position: relative;
     top: 0px;
     left: 0px;
@@ -186,7 +81,7 @@ html {
     border-bottom: 1px solid #bbb;
 }
 
-#mr_monitor_frame_table {
+.monitor_frame_table {
     position: relative;
     background-color: #bbb;
     width: 370px;
@@ -195,14 +90,17 @@ html {
     line-height: 1.5em;
 }
 
-.monitor_frame_content_td1 {
+table.monitor_frame_table th {
     width: 175px;
     background-color: #ddd;
     font-style: italic;
-    padding: 3px;
+    font-weight: normal;
+    padding-top: 3px;
+    padding-left: 7px;
+    padding-bottom: 3px;
 }
 
-.monitor_frame_content_td2 {
+table.monitor_frame_table td {
     width: 175px;
     background-color: #fff;
     font-weight: bold;
@@ -210,49 +108,43 @@ html {
     padding: 3px;
 }
 
-#wc_monitor_frame {
-    position: absolute;
-    top: 125px;
-    left: 380px;
-    width: 370px;
+.tab_divide_table {
+    width: 760px;
     background-color: #eee;
-    text-align: center;
-    margin: 10px;
-    border: 1px solid #bbb;
-    border-radius: 5px;
 }
 
-#wc_monitor_frame_header {
-    position: relative;
-    top: 0px;
-    left: 0px;
+table.tab_divide_table th {
+    font-size: 13px;
+    font-variant: small-caps;
+}
+
+table.tab_divide_table td {
     width: 370px;
-    background-color: #ddd;
-    text-align: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #bbb;
+    background-color: White;
+    font-size: 11px;
+    line-weight: 1.7em;
 }
 
-#wc_monitor_frame_table {
-    position: relative;
-    background-color: #bbb;
-    width: 370px;
-    font-size: 12px;
-    text-align: left;
-    line-height: 1.5em;
+/* --------------------------------------- TAB0 : Frobit (mr : mobile robot)------------------------------------- */
+#mr_manual_control_frame {
+    height: 285px;
 }
 
-#wc_manual_control_frame {
+#joystick_container {
     position: relative;
-    top: 15px;
-    width: 300px;
-    background-color: #eee;
-    text-align: center;
-    padding: 15px;
-    border: 1px solid #bbb;
-    border-radius: 5px;
+    z-index: 100;
 }
+
+#fake_joystick {
+    visibility: hidden;
+    position: relative;
+    top: 110px;
+    left: 145px;
+    width: 10px;
+    height: 10px;
+}
+
+/* --------------------------------------- TAB1 : Workcell (wc : work cell)------------------------------------- */
 
 #wc_mc_table {
     position: relative;
@@ -274,6 +166,7 @@ table#wc_mc_table th {
 
 .wc_mc_table_value {
     width: 30px;
+    font-size: 9px;
 }
 
 .wc_mc_table_slider {
@@ -281,50 +174,80 @@ table#wc_mc_table th {
     border: 1px solid Red;
 }
 
-#wc_monitor_usbcam_img {
+/* --------------------------------------- TAB2 : Tipper (tipper) ------------------------------------- */
+
+#tipper_control_table {
+    width: 300px;
+    margin-top: 10px;
+}
+
+#tipper_img {
+    width: 200px;
+    height: 266px;
+    margin-top: 40px;
+    border: 1px solid Black;
+    border-radius: 5px;
+}
+
+#tipper_manual_frame {
+    width: 80px;
+    text-align: center;
+    vertical-align: top;
+}
+
+#tipper_slider {
+    width: 10px;
+}
+
+.tipper_button {
+    width: 70px;
+    height: 30px;
+    margin: 5px;
+}
+
+/* --------------------------------------- TAB3 : Belt (belt) ------------------------------------- */
+#belt_on_off_switch {
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px solid DarkBlue;
+}
+
+#belt_img {
+    width: 200px;
+    height: 250px;
+    margin-top: 10px;
+    border: 1px solid Black;
+    border-radius: 5px;
+}
+
+/* --------------------------------------- TAB4 : Cameras (cam) ------------------------------------- */
+#cam_mr_img {
     width: 370px;
     font-size: 10px;
     font-variant: italic;
     border: 1px solid Black;
 }
 
-#mr_monitor_usbcam_img {
+#cam_wc_img {
     width: 370px;
     font-size: 10px;
     font-variant: italic;
     border: 1px solid Black;
 }
 
-#cameras_table {
-    width: 760px;
+/* --------------------- Console ----------------- */
+#console_frame {
     background-color: #eee;
+    text-align: center;
+    border-top: 1px solid #ccc;
 }
 
-table#cameras_table th {
+#textarea_console {
+    background-color: transparent;
     font-size: 13px;
-    font-variant: small-caps;
-}
-
-table#cameras_table td {
-    width: 370px;
-    background-color: White;
-    font-size: 11px;
-    line-weight: 1.7em;
-}
-
-#ros_structure_table {
-    width: 760px;
-    background-color: #eee;
-}
-
-table#ros_structure_table th {
-    font-size: 13px;
-    font-variant: small-caps;
-}
-
-table#ros_structure_table td {
-    width: 370px;
-    background-color: White;
-    font-size: 11px;
-    line-weight: 1.7em;
+    font-family: Courier;
+    text-align: left;
+    line-height: 1.3em;
+    margin: 5px;
+    border: 0px;
 }

@@ -35,7 +35,8 @@
 #input_tab3:checked ~ #tabs_content3,
 #input_tab4:checked ~ #tabs_content4,
 #input_tab5:checked ~ #tabs_content5,
-#input_tab6:checked ~ #tabs_content6 {
+#input_tab6:checked ~ #tabs_content6,
+#input_tab7:checked ~ #tabs_content7{
   display: block;
 }
 
@@ -212,4 +213,66 @@
 }
 .beltonoffswitch-checkbox:checked + .beltonoffswitch-label .beltonoffswitch-switch {
     right: 0px;
+}
+
+/* Radio buttons for MES */
+
+/* hide input */
+.mes_rb_input:empty {
+    margin-left: -999px;
+}
+
+/* style label */
+.mes_rb_input:empty ~ label {
+    position: relative;
+    float: left;
+    line-height: 2.5em;
+    text-indent: 3.25em;
+    margin-top: 2em;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mes_rb_input:empty ~ label:before {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    content: '';
+    width: 2.5em;
+    background: #D1D3D4;
+    border-radius: 3px 0 0 3px;
+}
+
+/* toggle hover */
+.mes_rb_input:hover:not(:checked) ~ label:before {
+    content:'\2714';
+    text-indent: .9em;
+    color: #C2C2C2;
+}
+
+.mes_rb_input:hover:not(:checked) ~ label {
+    color: #888;
+}
+
+/* toggle on */
+.mes_rb_input:checked ~ label:before {
+    content:'\2714';
+    text-indent: .9em;
+    color: #9CE2AE;
+    background-color: #4DCB6D;
+}
+
+.mes_rb_input:checked ~ label {
+    color: DarkGreen;
+    font-weight: bold;
+}
+
+/* radio focus */
+.mes_rb_input:focus ~ label:before {
+    box-shadow: 0 0 0 3px #999;
 }

@@ -43,8 +43,8 @@ function init_ros() {
 function init_ros_frobit() {
     // Connecting to Frobit's ROSCORE using ROSBRIDGE
     ros_frobit = new ROSLIB.Ros({
-        //url : 'ws://localhost:9090'   // For testing on my computer
-        url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        url : 'ws://localhost:9090'   // For testing on my computer
+        //url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_frobit.on('connection', function() {
@@ -71,7 +71,7 @@ function init_ros_frobit() {
     // Topics on Frobit's ROSCORE
     ui_mr_str_control_topic = new ROSLIB.Topic({
         ros : ros_frobit,
-        name : '/ui/str_control_frobit',
+        name : '/ui_str_control',
         messageType : 'std_msgs/String'
     });
 
@@ -85,30 +85,6 @@ function init_ros_frobit() {
         ros : ros_frobit,
         name : '/fmPlan/automode',
         messageType : 'msgs/IntStamped'
-    });
-
-    ui_mes_frobit_topic = new ROSLIB.Topic({
-        ros : ros_frobit,
-        name : '/ui/mes',
-        messageType : 'msgs/IntStamped'
-    });
-
-    frobit_next_mission_topic = new ROSLIB.Topic({
-        ros : ros_frobit,
-        name : '/mission/next_mission',
-        messageType : 'std_msgs/String'
-    });
-
-    tipper_automode_topic = new ROSLIB.Topic({
-        ros : ros_frobit,
-        name : '/ui/tipper_automode',
-        messageType : 'msgs/BoolStamped'
-    });
-
-    tipper_position_topic = new ROSLIB.Topic({
-        ros : ros_frobit,
-        name : '/ui/tipper_position',
-        messageType : 'msgs/FloatStamped'
     });
 
     mr_usbcam_topic = new ROSLIB.Topic({
@@ -129,28 +105,10 @@ function init_ros_frobit() {
             document.getElementById("mr_monitor_mode").innerHTML = 'Automode';
         } else if (message.data == 0) {
             document.getElementById("mr_monitor_mode").innerHTML = 'Manual control';
+        } else {
+            document.getElementById("mr_monitor_mode").innerHTML = 'Not published yet';
         }
-    });
 
-    // Mobile Robot next mission subscription
-    frobit_next_mission_topic.subscribe(function(message) {
-        document.getElementById("mes_mr_next_mission_div").innerHTML = 'Next mission: '+message.data;
-        document.getElementById("mr_monitor_mission").innerHTML = message.data;
-    });
-
-    // Tipper automode state subscription
-    tipper_automode_topic.subscribe(function(message) {
-        if (message.data == true) {
-            document.getElementById("tipper_monitor_mode").innerHTML = 'Automode';
-        } else if (message.data == false) {
-            document.getElementById("tipper_monitor_mode").innerHTML = 'Manual control';
-        }
-    });
-
-    // Tipper position subscription
-    tipper_position_topic.subscribe(function(message) {
-        document.getElementById("tipper_monitor_position").innerHTML = Math.round(message.data * 100) / 100;
-        tipper_set_value(document.getElementById("tipper_slider"), message.data*20);
     });
 
     // Image from MR usbcam
@@ -210,7 +168,7 @@ function init_ros_workcell() {
     // Topics on Workcell's CORE
     ui_wc_str_control_topic = new ROSLIB.Topic({
         ros : ros_workcell,
-        name : '/ui/str_control_workcell',
+        name : '/ui_str_control_wc',
         messageType : 'std_msgs/String'
     });
 
@@ -480,7 +438,7 @@ function tabs_clicked() {
 function joystick_moved(x0, y0, x, y) {
     var x_rounded = Math.round(x * 100) / 100;
     var y_rounded = Math.round(y * 100) / 100;
-    ros_msg_frobit('mr_joystick_'+x0+";"+y0+";"+x_rounded+";"+y_rounded);
+    ros_msg_frobit('mr_joystick;'+x0+";"+y0+";"+x_rounded+";"+y_rounded);
     var sw = document.getElementById('mr_man_auto_switch');
     if (sw.checked) {
         sw.checked = false;
@@ -639,8 +597,10 @@ function tipper_up() {
     var slider = document.getElementById('tipper_slider');
     var new_val = parseInt(slider.value)+parseInt(tipper_step);
     if (parseInt(new_val) <= parseInt(slider.max)) {
-        ros_msg_frobit('tipper_move_up');
-        tipper_set_value(slider, new_val);
+        slider.value = new_val;
+        ros_msg_frobit('tipper_u');
+        document.getElementById('tipper_img').src = 'img/frobit_tipper_'+parseInt(4*new_val/parseInt(slider.max))+'.png'
+        to_console('Tipper moved to '+new_val);
     }
 }
 
@@ -649,15 +609,11 @@ function tipper_down() {
     var slider = document.getElementById('tipper_slider');
     var new_val = parseInt(slider.value)-parseInt(tipper_step);
     if (parseInt(new_val) >= parseInt(slider.min)) {
-        ros_msg_frobit('tipper_move_down');
-        tipper_set_value(slider, new_val);
+        slider.value = new_val;
+        ros_msg_frobit('tipper_d');
+        document.getElementById('tipper_img').src = 'img/frobit_tipper_'+parseInt(4*new_val/parseInt(slider.max))+'.png'
+        to_console('Tipper moved to '+new_val);
     }
-}
-
-function tipper_set_value(slider, value) {
-    slider.value = value;
-    document.getElementById('tipper_img').src = 'img/frobit_tipper_'+parseInt(4*value/parseInt(slider.max))+'.png'
-    to_console('Tipper moved to '+parseFloat(value)/20);
 }
 
 /* ---------------------------- BELT ------------------------------------ */
@@ -685,10 +641,4 @@ function belt_on_off_changed() {
     } else {
         ros_msg_workcell('belt_off');
     }
-}
-
-/* ---------------------------- MES-sim ------------------------------------ */
-function on_mes_frobit_change(value) {
-    var msg = new ROSLIB.Message({data : value});
-    ui_mes_frobit_topic.publish(msg);
 }

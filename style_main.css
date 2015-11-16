@@ -121,8 +121,8 @@ table.tab_divide_table th {
 table.tab_divide_table td {
     width: 370px;
     background-color: White;
-    font-size: 11px;
-    line-weight: 1.7em;
+    font-size: 12px;
+    line-height: 1.7em;
 }
 
 /* --------------------------------------- TAB0 : Frobit (mr : mobile robot)------------------------------------- */
@@ -233,6 +233,41 @@ table#wc_mc_table th {
     font-size: 10px;
     font-variant: italic;
     border: 1px solid Black;
+}
+
+/* --------------------------------------- TAB6 : MES (mes) ----------------------------------------- */
+.mes_rb_div {
+    clear: both;
+    margin: 0 30px;
+}
+
+.mes_rb_label {
+    width: 200px;
+    font-size: 13px;
+    border-radius: 3px;
+    border: 1px solid #D1D3D4
+}
+
+.mes_rb_intspan {
+    width: 10px;
+    font-size: 70%;
+    color: DarkGray;
+    float: right;
+}
+
+#mes_mr_next_mission_div {
+    position: relative;
+    top: 20px;
+    left: 20px;
+    width: 300px;
+    background-color: LightYellow;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 7px;
 }
 
 /* --------------------- Console ----------------- */

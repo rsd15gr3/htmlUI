@@ -127,10 +127,12 @@ table.tab_divide_table td {
 
 /* --------------------------------------- TAB0 : Frobit (mr : mobile robot)------------------------------------- */
 #mr_manual_control_frame {
+    visibility: hidden;
     height: 285px;
 }
 
 #joystick_container {
+    visibility: hidden;
     position: relative;
     z-index: 100;
 }
@@ -175,6 +177,10 @@ table#wc_mc_table th {
 }
 
 /* --------------------------------------- TAB2 : Tipper (tipper) ------------------------------------- */
+
+#tipper_manual_control_frame {
+    visibility: hidden;
+}
 
 #tipper_control_table {
     width: 300px;
@@ -284,11 +290,11 @@ table#wc_mc_table th {
 .img_safety_button {
     width: 100px;
     margin: 14px;
-    cursor: pointer;
+    cursor: wait;
 }
 
 .img_safety_button:hover {
-    background-color: Red;
+    background-color: Black;
 }
 
 /* --------------------- Console ----------------- */

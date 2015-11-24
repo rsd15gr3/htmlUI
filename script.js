@@ -44,15 +44,12 @@ function init_ros_frobit() {
     // Connecting to Frobit's ROSCORE using ROSBRIDGE
     ros_frobit = new ROSLIB.Ros({
         //url : 'ws://localhost:9090'   // For testing on my computer
+        //url : 'ws://10.125.5.189:9090'
         url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_frobit.on('connection', function() {
-        document.getElementById("onoff_frobit").checked = 'checked';
-        document.getElementById("mr_monitor_ip").style.backgroundColor = 'LightGreen';
-        document.getElementById("tipper_monitor_ip").style.backgroundColor = 'LightGreen';
-        console.log('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
-        to_console('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
+        frobit_connected();
     });
 
     ros_frobit.on('error', function(error) {
@@ -61,11 +58,7 @@ function init_ros_frobit() {
     });
 
     ros_frobit.on('close', function() {
-        document.getElementById("onoff_frobit").checked = '';
-        document.getElementById("mr_monitor_ip").style.backgroundColor = 'Red';
-        document.getElementById("tipper_monitor_ip").style.backgroundColor = 'Red';
-        console.log('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
-        to_console('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
+        frobit_disconnected();
     });
 
     // Topics on Frobit's ROSCORE
@@ -119,16 +112,19 @@ function init_ros_frobit() {
 
     // Mobile Robot velocities (linear and angular)
     cmd_vel_topic.subscribe(function(message) {
+        document.getElementById("joystick_container").style.visibility = "visible";
         document.getElementById("mr_monitor_linvel").innerHTML = Math.round(message.twist.linear.x * 100) / 100;
         document.getElementById("mr_monitor_angvel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
     });
 
     // Mobile Robot control mode
     control_mode_frobit_topic.subscribe(function(message) {
+        document.getElementById("mr_manual_control_frame").style.visibility = "visible";
+        document.getElementById("img_safety_button_frobit").style.cursor = "pointer";
         if (message.data == 1) {
-            document.getElementById("mr_monitor_mode").innerHTML = 'Automode';
+            mr_automode_is_true();
         } else if (message.data == 0) {
-            document.getElementById("mr_monitor_mode").innerHTML = 'Manual control';
+            mr_automode_is_false();
         }
     });
 
@@ -140,10 +136,12 @@ function init_ros_frobit() {
 
     // Tipper automode state subscription
     tipper_automode_topic.subscribe(function(message) {
+        document.getElementById("tipper_manual_control_frame").style.visibility = "visible";
+        document.getElementById("img_safety_button_tipper").style.cursor = "pointer";
         if (message.data == true) {
-            document.getElementById("tipper_monitor_mode").innerHTML = 'Automode';
+            tipper_automode_is_true();
         } else if (message.data == false) {
-            document.getElementById("tipper_monitor_mode").innerHTML = 'Manual control';
+            tipper_automode_is_false();
         }
     });
 
@@ -363,6 +361,43 @@ function ros_msg_workcell(data_str) {
 }
 
 /* ---------------------------- FROBIT ------------------------------------ */
+
+function frobit_connected() {
+    document.getElementById("onoff_frobit").checked = 'checked';
+    document.getElementById("mr_monitor_ip").style.backgroundColor = 'LightGreen';
+    document.getElementById("tipper_monitor_ip").style.backgroundColor = 'LightGreen';
+    console.log('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
+    to_console('Connected to Frobit\'s ROSCORE on '+ip_frobit+'.');
+}
+
+function frobit_disconnected() {
+    // Frobit info reactions
+    document.getElementById("mr_manual_control_frame").style.visibility = "hidden";
+    document.getElementById("joystick_container").style.visibility = "hidden";
+    document.getElementById("img_safety_button_frobit").src = "img/cant_read_frobit.png";
+    document.getElementById("img_safety_button_frobit").onclick = ""
+    document.getElementById("img_safety_button_frobit").style.cursor = "wait";
+    document.getElementById("mr_monitor_mode").innerHTML = "&nbsp;";
+    document.getElementById("mr_monitor_mission").innerHTML = "&nbsp;";
+    document.getElementById("mr_monitor_position").innerHTML = "&nbsp;";
+    document.getElementById("mr_monitor_linvel").innerHTML = "&nbsp;";
+    document.getElementById("mr_monitor_angvel").innerHTML = "&nbsp;";
+
+    // Tipper info reactions
+    document.getElementById("tipper_manual_control_frame").style.visibility = "hidden";
+    document.getElementById("img_safety_button_tipper").src = "img/cant_read_tipper.png";
+    document.getElementById("img_safety_button_tipper").onclick = ""
+    document.getElementById("img_safety_button_tipper").style.cursor = "wait";
+    document.getElementById("tipper_monitor_mode").innerHTML = "&nbsp;";
+    document.getElementById("tipper_monitor_position").innerHTML = "&nbsp;";
+
+    document.getElementById("onoff_frobit").checked = '';
+    document.getElementById("mr_monitor_ip").style.backgroundColor = 'Red';
+    document.getElementById("tipper_monitor_ip").style.backgroundColor = 'Red';
+    console.log('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
+    to_console('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
+}
+
 /* Initialize joystick for frobit's manual control */
 function init_manual_control_for_frobit() {
     $('#mr_manual_control_frame').bind('keydown', function(event) {
@@ -478,24 +513,46 @@ function tabs_clicked() {
 
 /* Change on the joystick */
 function joystick_moved(x0, y0, x, y) {
+    mr_make_automode_false();
     var x_rounded = Math.round(x * 100) / 100;
     var y_rounded = Math.round(y * 100) / 100;
     ros_msg_frobit('mr_joystick_'+x0+";"+y0+";"+x_rounded+";"+y_rounded);
-    var sw = document.getElementById('mr_man_auto_switch');
-    if (sw.checked) {
-        sw.checked = false;
-        mr_man_auto_changed()
-    }
+}
+
+/* Frobit automode topic subscribed and evaluated as True */
+function mr_automode_is_true() {
+    document.getElementById("mr_monitor_mode").innerHTML = 'Automode';
+    document.getElementById("img_safety_button_frobit").src = "img/stop_frobit.png";
+    document.getElementById("img_safety_button_frobit").onclick = mr_make_automode_false;
+    mr_set_opacity_for_man_control(0.5);
+    document.getElementById('mr_man_auto_switch').checked = true;
+}
+
+/* Frobit automode topic subscribed and evaluated as False */
+function mr_automode_is_false() {
+    document.getElementById("mr_monitor_mode").innerHTML = 'Manual control';
+    document.getElementById("img_safety_button_frobit").src = "img/run_frobit_auto.png";
+    document.getElementById("img_safety_button_frobit").onclick = mr_make_automode_true;
+    mr_set_opacity_for_man_control(1.0);
+    document.getElementById('mr_man_auto_switch').checked = false;
+}
+
+/* Change Frobit's mode to be Automode */
+function mr_make_automode_true() {
+    ros_msg_frobit('mr_mode_auto');
+}
+
+/* Change Frobit's mode to be Manual */
+function mr_make_automode_false() {
+    ros_msg_frobit('mr_mode_manual');
 }
 
 /* Manual-auto control of mobile robot changed */
 function mr_man_auto_changed() {
     if (document.getElementById('mr_man_auto_switch').checked) {
-        ros_msg_frobit('mr_mode_auto');
-        mr_set_opacity_for_man_control(0.5);
+        mr_make_automode_true();
     } else {
-        ros_msg_frobit('mr_mode_manual');
-        mr_set_opacity_for_man_control(1.0);
+        mr_make_automode_false();
     }
 }
 
@@ -503,15 +560,6 @@ function mr_man_auto_changed() {
 function mr_set_opacity_for_man_control(op) {
     document.getElementById('joystick_base').style.opacity = op;
     document.getElementById('joystick_stick').style.opacity = op;
-}
-
-function mr_stop_clicked() {
-    var sw = document.getElementById('mr_man_auto_switch');
-    if (sw.checked) {
-        sw.checked = false;
-        mr_man_auto_changed()
-    }
-    ros_msg_frobit('mr_stop');
 }
 
 /* ---------------------------- WORKCELL ------------------------------------ */
@@ -627,29 +675,42 @@ function wc_stop_clicked() {
 }
 
 /* ---------------------------- TIPPER ------------------------------------ */
+
+function tipper_automode_is_true() {
+    document.getElementById("tipper_monitor_mode").innerHTML = 'Automode';
+    document.getElementById("img_safety_button_tipper").src = "img/stop_tipper.png";
+    document.getElementById("img_safety_button_tipper").onclick = tipper_make_automode_false;
+    document.getElementById('tipper_man_auto_switch').checked = true;
+    document.getElementById('tipper_manual_frame').style.opacity = 0.5;
+}
+
+function tipper_automode_is_false() {
+    document.getElementById("tipper_monitor_mode").innerHTML = 'Manual control';
+    document.getElementById("img_safety_button_tipper").src = "img/run_tipper_auto.png";
+    document.getElementById("img_safety_button_tipper").onclick = tipper_make_automode_true;
+    document.getElementById('tipper_man_auto_switch').checked = false;
+    document.getElementById('tipper_manual_frame').style.opacity = 1.0;
+}
+
+function tipper_make_automode_true() {
+    ros_msg_frobit('tipper_mode_auto');
+}
+
+function tipper_make_automode_false() {
+    ros_msg_frobit('tipper_mode_manual');
+}
+
 /* Manual-auto control of tipper changed */
 function tipper_man_auto_changed() {
     if (document.getElementById('tipper_man_auto_switch').checked) {
-        ros_msg_frobit('tipper_mode_auto');
-        document.getElementById('tipper_manual_frame').style.opacity = 0.5;
+        tipper_make_automode_true();
     } else {
-        ros_msg_frobit('tipper_mode_manual');
-        document.getElementById('tipper_manual_frame').style.opacity = 1.0;
-    }
-}
-
-function tipper_man_control_clicked() {
-    // Manual-auto control change?
-    var sw = document.getElementById('tipper_man_auto_switch');
-    if (sw.checked) {
-        ros_msg_frobit('tipper_mode_manual');
-        sw.checked = false;
-        document.getElementById('tipper_manual_frame').style.opacity = 1.0;
+        tipper_make_automode_false();
     }
 }
 
 function tipper_up() {
-    tipper_man_control_clicked();
+    tipper_make_automode_false();
     var slider = document.getElementById('tipper_slider');
     var new_val = parseInt(slider.value)+parseInt(tipper_step);
     if (parseInt(new_val) <= parseInt(slider.max)) {
@@ -659,7 +720,7 @@ function tipper_up() {
 }
 
 function tipper_down() {
-    tipper_man_control_clicked();
+    tipper_make_automode_false();
     var slider = document.getElementById('tipper_slider');
     var new_val = parseInt(slider.value)-parseInt(tipper_step);
     if (parseInt(new_val) >= parseInt(slider.min)) {
@@ -672,11 +733,6 @@ function tipper_set_value(slider, value) {
     slider.value = value;
     document.getElementById('tipper_img').src = 'img/frobit_tipper_'+parseInt(4*value/parseInt(slider.max))+'.png'
     to_console('Tipper moved to '+parseFloat(value)/20);
-}
-
-function tipper_stop_clicked() {
-    tipper_man_control_clicked();
-    ros_msg_frobit('tipper_stop');
 }
 
 /* ---------------------------- BELT ------------------------------------ */

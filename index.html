@@ -118,9 +118,9 @@
                 <input id="input_tab1" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();" checked>
                 <label for="input_tab1" class="tabs_labels">Frobit</label>
                 <input id="input_tab2" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
-                <label for="input_tab2" class="tabs_labels">Workcell</label>
+                <label for="input_tab2" class="tabs_labels">Tipper</label>
                 <input id="input_tab3" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
-                <label for="input_tab3" class="tabs_labels">Tipper</label>
+                <label for="input_tab3" class="tabs_labels">Workcell</label>
                 <input id="input_tab4" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
                 <label for="input_tab4" class="tabs_labels">Belt</label>
                 <input id="input_tab5" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
@@ -133,7 +133,7 @@
                 <section id="tabs_content1"  class="tabs_sections">
                     <div id="mr_manual_control_frame" class="control_frame" tabindex="0">
                          <div class="automanualswitch">
-                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();">
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();" />
                             <label class="automanualswitch-label" for="mr_man_auto_switch">
                                 <span class="automanualswitch-inner"></span>
                                 <span class="automanualswitch-switch"></span>
@@ -160,6 +160,43 @@
                 </section>
 
                 <section id="tabs_content2"  class="tabs_sections">
+                    <div id="tipper_manual_control_frame" class="control_frame">
+                        <div class="automanualswitch">
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="tipper_man_auto_switch" onclick="tipper_man_auto_changed();">
+                            <label class="automanualswitch-label" for="tipper_man_auto_switch">
+                                <span class="automanualswitch-inner"></span>
+                                <span class="automanualswitch-switch"></span>
+                            </label>
+                        </div>
+                        <table id="tipper_control_table" cellspacing="5">
+                            <tr>
+                                <td>
+                                    <img id="tipper_img" src="img/frobit_tipper_0.png" />
+                                </td>
+                                <td id="tipper_manual_frame">
+                                    <input class="tipper_button" type="button" value="UP" onclick="tipper_up();" />
+                                    <br />
+                                    <input id="tipper_slider" type="range" orient="vertical" disabled />
+                                    <br />
+                                    <input class="tipper_button" type="button" value="DOWN" onclick="tipper_down();" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="monitor_frame">
+                        <div class="monitor_frame_header">
+                            Tipper Online Monitor
+                        </div>
+                        <table class="monitor_frame_table">
+                            <tr><th>Connection (frobit core):</th><td id="tipper_monitor_ip">&nbsp;</td></tr>
+                            <tr><th>Control Mode [auto/man]:</th><td id="tipper_monitor_mode">Manual control</td></tr>
+                            <tr><th>Position:</th><td id="tipper_monitor_position">&nbsp;</td></tr>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="tabs_content3"  class="tabs_sections">
                     <div class="control_frame">
                         <div class="automanualswitch">
                             <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="wc_man_auto_switch" onclick="wc_man_auto_changed();">
@@ -248,43 +285,6 @@
                             <tr><th>Joint 3:</th><td id="wc_monitor_j3">&nbsp;</td></tr>
                             <tr><th>Joint 4:</th><td id="wc_monitor_j4">&nbsp;</td></tr>
                             <tr><th>Joint 5:</th><td id="wc_monitor_j5">&nbsp;</td></tr>
-                        </table>
-                    </div>
-                </section>
-
-                <section id="tabs_content3"  class="tabs_sections">
-                    <div class="control_frame">
-                        <div class="automanualswitch">
-                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="tipper_man_auto_switch" onclick="tipper_man_auto_changed();">
-                            <label class="automanualswitch-label" for="tipper_man_auto_switch">
-                                <span class="automanualswitch-inner"></span>
-                                <span class="automanualswitch-switch"></span>
-                            </label>
-                        </div>
-                        <table id="tipper_control_table" cellspacing="5">
-                            <tr>
-                                <td>
-                                    <img id="tipper_img" src="img/frobit_tipper_0.png" />
-                                </td>
-                                <td id="tipper_manual_frame">
-                                    <input class="tipper_button" type="button" value="UP" onclick="tipper_up();" />
-                                    <br />
-                                    <input id="tipper_slider" type="range" orient="vertical" disabled />
-                                    <br />
-                                    <input class="tipper_button" type="button" value="DOWN" onclick="tipper_down();" />
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <div class="monitor_frame">
-                        <div class="monitor_frame_header">
-                            Tipper Online Monitor
-                        </div>
-                        <table class="monitor_frame_table">
-                            <tr><th>Connection (frobit core):</th><td id="tipper_monitor_ip">&nbsp;</td></tr>
-                            <tr><th>Control Mode [auto/man]:</th><td id="tipper_monitor_mode">Manual control</td></tr>
-                            <tr><th>Position:</th><td id="tipper_monitor_position">&nbsp;</td></tr>
                         </table>
                     </div>
                 </section>
@@ -382,10 +382,10 @@
                 </textarea>
             </div>
             <div id="safety_buttons_frame">
-                <img class="img_safety_button" src="img/stop_frobit.png" onclick="mr_stop_clicked();" />
-                <img class="img_safety_button" src="img/stop_tipper.png" onclick="tipper_stop_clicked();" />
-                <img class="img_safety_button" src="img/stop_workcell.png" onclick="wc_stop_clicked();" />
-                <img class="img_safety_button" src="img/stop_belt.png" onclick="belt_stop_clicked();" />
+                <img id="img_safety_button_frobit" class="img_safety_button" src="img/cant_read_frobit.png" />
+                <img id="img_safety_button_tipper" class="img_safety_button" src="img/cant_read_tipper.png" />
+                <img id="img_safety_button_workcell" class="img_safety_button" src="img/cant_read_workcell.png" />
+                <img id="img_safety_button_belt" class="img_safety_button" src="img/cant_read_belt.png" />
             </div>
         </div>
         <div id="joystick_container">

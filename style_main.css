@@ -270,6 +270,27 @@ table#wc_mc_table th {
     border-radius: 7px;
 }
 
+/* --------------------- Safety buttons (stop buttons) ----------------- */
+#safety_buttons_frame {
+    position: absolute;
+    top: 0px;
+    right: -130px;
+    background-color: #ccc;
+    width: 128px;
+    border-right: 1px solid DarkGray;
+    border-bottom: 1px solid DarkGray;
+}
+
+.img_safety_button {
+    width: 100px;
+    margin: 14px;
+    cursor: pointer;
+}
+
+.img_safety_button:hover {
+    background-color: Red;
+}
+
 /* --------------------- Console ----------------- */
 #console_frame {
     background-color: #eee;

@@ -505,6 +505,15 @@ function mr_set_opacity_for_man_control(op) {
     document.getElementById('joystick_stick').style.opacity = op;
 }
 
+function mr_stop_clicked() {
+    var sw = document.getElementById('mr_man_auto_switch');
+    if (sw.checked) {
+        sw.checked = false;
+        mr_man_auto_changed()
+    }
+    ros_msg_frobit('mr_stop');
+}
+
 /* ---------------------------- WORKCELL ------------------------------------ */
 /* Set workcell parameters to the control system */
 function init_manual_control_for_workcell() {
@@ -612,6 +621,11 @@ function wc_mc_joint_up(joint_id) {
     }
 }
 
+function wc_stop_clicked() {
+    wc_man_control_clicked();
+    ros_msg_workcell('wc_stop');
+}
+
 /* ---------------------------- TIPPER ------------------------------------ */
 /* Manual-auto control of tipper changed */
 function tipper_man_auto_changed() {
@@ -660,6 +674,11 @@ function tipper_set_value(slider, value) {
     to_console('Tipper moved to '+parseFloat(value)/20);
 }
 
+function tipper_stop_clicked() {
+    tipper_man_control_clicked();
+    ros_msg_frobit('tipper_stop');
+}
+
 /* ---------------------------- BELT ------------------------------------ */
 /* Manual-auto control of belt changed */
 function belt_man_auto_changed() {
@@ -672,19 +691,28 @@ function belt_man_auto_changed() {
     }
 }
 
-/* Belt switched on/off */
-function belt_on_off_changed() {
+function belt_man_control_clicked() {
     var sw = document.getElementById('belt_man_auto_switch');
     if (sw.checked) {
         ros_msg_workcell('belt_mode_manual');
         sw.checked = false;
         document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 1.0;
     }
+}
+
+/* Belt switched on/off */
+function belt_on_off_changed() {
+    belt_man_control_clicked();
     if (document.getElementById('belt_on_off_switch').checked) {
         ros_msg_workcell('belt_on');
     } else {
         ros_msg_workcell('belt_off');
     }
+}
+
+function belt_stop_clicked() {
+    belt_man_control_clicked();
+    ros_msg_workcell('belt_stop');
 }
 
 /* ---------------------------- MES-sim ------------------------------------ */

@@ -44,8 +44,8 @@ function init_ros_frobit() {
     // Connecting to Frobit's ROSCORE using ROSBRIDGE
     ros_frobit = new ROSLIB.Ros({
         //url : 'ws://localhost:9090'   // For testing on my computer
-        url : 'ws://10.125.7.186:9090'
-        //url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        //url : 'ws://10.125.7.186:9090'
+        url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_frobit.on('connection', function() {
@@ -179,8 +179,8 @@ function init_ros_workcell() {
     // Connecting to Workcell's ROSCORE using ROSBRIDGE
     ros_workcell = new ROSLIB.Ros({
         //url : 'ws://localhost:9090'   // For testing on my computer
-        url : 'ws://10.125.7.186:9090'
-        //url : 'ws://'+ip_workcell+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        //url : 'ws://10.125.7.186:9090'
+        url : 'ws://'+ip_workcell+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_workcell.on('connection', function() {

@@ -16,6 +16,12 @@
         <script src="virtualjoystick.js"></script>
         <script type="text/javascript">
             /* ---------------- Define global parameters for all scripts --------------------- */
+            // Tipper
+            var tipper_step = 5;
+            var tipper_min = 0;
+            var tipper_max = 20;
+            var tipper_init = 0;
+
             // WorkCell
             var wc_mc_joint_step = 0.1;
 
@@ -127,7 +133,7 @@
                 <section id="tabs_content1"  class="tabs_sections">
                     <div id="mr_manual_control_frame" class="control_frame" tabindex="0">
                          <div class="automanualswitch">
-                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();" disabled />
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();" />
                             <label class="automanualswitch-label" for="mr_man_auto_switch">
                                 <span class="automanualswitch-inner"></span>
                                 <span class="automanualswitch-switch"></span>
@@ -144,7 +150,7 @@
                         </div>
                         <table class="monitor_frame_table">
                             <tr><th>Connection (frobit core):</th><td id="mr_monitor_ip">&nbsp;</td></tr>
-                            <tr><th>Control Mode [auto/man]:</th><td id="mr_monitor_mode">&nbsp;</td></tr>
+                            <tr><th>Control Mode [auto/man]:</th><td id="mr_monitor_mode">Manual control</td></tr>
                             <tr><th>Next mission:</th><td id="mr_monitor_mission">&nbsp;</td></tr>
                             <tr><th>Position On Map:</th><td id="mr_monitor_position">&nbsp;</td></tr>
                             <tr><th>Linear velocity:</th><td id="mr_monitor_linvel">&nbsp;</td></tr>
@@ -156,7 +162,7 @@
                 <section id="tabs_content2"  class="tabs_sections">
                     <div id="tipper_manual_control_frame" class="control_frame">
                         <div class="automanualswitch">
-                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="tipper_man_auto_switch" onclick="tipper_man_auto_changed();" disabled />
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="tipper_man_auto_switch" onclick="tipper_man_auto_changed();">
                             <label class="automanualswitch-label" for="tipper_man_auto_switch">
                                 <span class="automanualswitch-inner"></span>
                                 <span class="automanualswitch-switch"></span>
@@ -168,11 +174,11 @@
                                     <img id="tipper_img" src="img/frobit_tipper_0.png" />
                                 </td>
                                 <td id="tipper_manual_frame">
-                                    <input class="tipper_button" type="button" value="UP" onclick="tipper_up();" disabled />
+                                    <input class="tipper_button" type="button" value="UP" onclick="tipper_up();" />
                                     <br />
-                                    <input id="tipper_slider" type="range" min=0 max=2 step=1 value=0 orient="vertical" disabled />
+                                    <input id="tipper_slider" type="range" orient="vertical" disabled />
                                     <br />
-                                    <input class="tipper_button" type="button" value="DOWN" onclick="tipper_down();" disabled />
+                                    <input class="tipper_button" type="button" value="DOWN" onclick="tipper_down();" />
                                 </td>
                             </tr>
                         </table>
@@ -184,7 +190,7 @@
                         </div>
                         <table class="monitor_frame_table">
                             <tr><th>Connection (frobit core):</th><td id="tipper_monitor_ip">&nbsp;</td></tr>
-                            <tr><th>Control Mode [auto/man]:</th><td id="tipper_monitor_mode">&nbsp;</td></tr>
+                            <tr><th>Control Mode [auto/man]:</th><td id="tipper_monitor_mode">Manual control</td></tr>
                             <tr><th>Position:</th><td id="tipper_monitor_position">&nbsp;</td></tr>
                         </table>
                     </div>
@@ -293,27 +299,11 @@
                             </label>
                          </div>
 
-                        <div id="belt_on_off_switch_div" class="beltonoffswitch">
+                        <div class="beltonoffswitch">
                             <input type="checkbox" name="beltonoffswitch" class="beltonoffswitch-checkbox" id="belt_on_off_switch" onclick="belt_on_off_changed();">
                             <label class="beltonoffswitch-label" for="belt_on_off_switch">
                                 <span class="beltonoffswitch-inner"></span>
                                 <span class="beltonoffswitch-switch"></span>
-                            </label>
-                        </div>
-
-                        <div id="belt_direction_switch_div" class="beltdirectionswitch">
-                            <input type="checkbox" name="beltdirectionswitch" class="beltdirectionswitch-checkbox" id="belt_direction_switch" onclick="belt_direction_changed();" checked>
-                            <label class="beltdirectionswitch-label" for="belt_direction_switch">
-                                <span class="beltdirectionswitch-inner"></span>
-                                <span class="beltdirectionswitch-switch"></span>
-                            </label>
-                        </div>
-
-                        <div id="belt_speed_switch_div" class="beltspeedswitch">
-                            <input type="checkbox" name="beltspeedswitch" class="beltspeedswitch-checkbox" id="belt_speed_switch" onclick="belt_speed_changed();" checked>
-                            <label class="beltspeedswitch-label" for="belt_speed_switch">
-                                <span class="beltspeedswitch-inner"></span>
-                                <span class="beltspeedswitch-switch"></span>
                             </label>
                         </div>
 
@@ -328,7 +318,6 @@
                             <tr><th>Connection (workcell core):</th><td id="belt_monitor_ip">&nbsp;</td></tr>
                             <tr><th>Control Mode [auto/man]:</th><td id="belt_monitor_mode">&nbsp;</td></tr>
                             <tr><th>Status:</th><td id="belt_monitor_status">&nbsp;</td></tr>
-                            <tr><th>Direction:</th><td id="belt_monitor_direction">&nbsp;</td></tr>
                             <tr><th>Velocity:</th><td id="belt_monitor_velocity">&nbsp;</td></tr>
                         </table>
                     </div>

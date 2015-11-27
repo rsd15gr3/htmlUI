@@ -127,7 +127,6 @@ table.tab_divide_table td {
 
 /* --------------------------------------- TAB0 : Frobit (mr : mobile robot)------------------------------------- */
 #mr_manual_control_frame {
-    visibility: hidden;
     height: 285px;
 }
 
@@ -178,10 +177,6 @@ table#wc_mc_table th {
 
 /* --------------------------------------- TAB2 : Tipper (tipper) ------------------------------------- */
 
-#tipper_manual_control_frame {
-    visibility: hidden;
-}
-
 #tipper_control_table {
     width: 300px;
     margin-top: 10px;
@@ -212,16 +207,31 @@ table#wc_mc_table th {
 }
 
 /* --------------------------------------- TAB3 : Belt (belt) ------------------------------------- */
-#belt_on_off_switch {
+#belt_on_off_switch_div {
+    position: absolute;
     margin-top: 10px;
-    padding: 5px;
-    border: 1px solid DarkBlue;
+    margin-left: 10px;
+    width: 60px;
+}
+
+#belt_direction_switch_div {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 80px;
+    width: 110px;
+}
+
+#belt_speed_switch_div {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 200px;
+    width: 90px;
 }
 
 #belt_img {
     width: 200px;
     height: 250px;
-    margin-top: 10px;
+    margin-top: 70px;
     border: 1px solid Black;
     border-radius: 5px;
 }

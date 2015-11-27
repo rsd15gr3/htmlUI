@@ -44,8 +44,8 @@ function init_ros_frobit() {
     // Connecting to Frobit's ROSCORE using ROSBRIDGE
     ros_frobit = new ROSLIB.Ros({
         //url : 'ws://localhost:9090'   // For testing on my computer
-        //url : 'ws://10.125.5.189:9090'
-        url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        url : 'ws://10.125.7.186:9090'
+        //url : 'ws://'+ip_frobit+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_frobit.on('connection', function() {
@@ -101,7 +101,7 @@ function init_ros_frobit() {
     tipper_position_topic = new ROSLIB.Topic({
         ros : ros_frobit,
         name : '/ui/tipper_position',
-        messageType : 'msgs/FloatStamped'
+        messageType : 'msgs/IntStamped'
     });
 
     mr_usbcam_topic = new ROSLIB.Topic({
@@ -112,15 +112,14 @@ function init_ros_frobit() {
 
     // Mobile Robot velocities (linear and angular)
     cmd_vel_topic.subscribe(function(message) {
-        document.getElementById("joystick_container").style.visibility = "visible";
+        mr_control_enabled();
         document.getElementById("mr_monitor_linvel").innerHTML = Math.round(message.twist.linear.x * 100) / 100;
         document.getElementById("mr_monitor_angvel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
     });
 
     // Mobile Robot control mode
     control_mode_frobit_topic.subscribe(function(message) {
-        document.getElementById("mr_manual_control_frame").style.visibility = "visible";
-        document.getElementById("img_safety_button_frobit").style.cursor = "pointer";
+        mr_control_enabled();
         if (message.data == 1) {
             mr_automode_is_true();
         } else if (message.data == 0) {
@@ -136,8 +135,7 @@ function init_ros_frobit() {
 
     // Tipper automode state subscription
     tipper_automode_topic.subscribe(function(message) {
-        document.getElementById("tipper_manual_control_frame").style.visibility = "visible";
-        document.getElementById("img_safety_button_tipper").style.cursor = "pointer";
+        tipper_control_enabled();
         if (message.data == true) {
             tipper_automode_is_true();
         } else if (message.data == false) {
@@ -147,8 +145,8 @@ function init_ros_frobit() {
 
     // Tipper position subscription
     tipper_position_topic.subscribe(function(message) {
-        document.getElementById("tipper_monitor_position").innerHTML = Math.round(message.data * 100) / 100;
-        tipper_set_value(document.getElementById("tipper_slider"), message.data*20);
+        document.getElementById("tipper_monitor_position").innerHTML = message.data;
+        document.getElementById("tipper_slider").value = parseInt(message.data);
     });
 
     // Image from MR usbcam
@@ -181,15 +179,12 @@ function init_ros_workcell() {
     // Connecting to Workcell's ROSCORE using ROSBRIDGE
     ros_workcell = new ROSLIB.Ros({
         //url : 'ws://localhost:9090'   // For testing on my computer
-        url : 'ws://'+ip_workcell+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
+        url : 'ws://10.125.7.186:9090'
+        //url : 'ws://'+ip_workcell+':9090'   // You need to run ROSBRIDGE on target Ubuntu first
     });
 
     ros_workcell.on('connection', function() {
-        document.getElementById("onoff_workcell").checked = 'checked';
-        document.getElementById("wc_monitor_ip").style.backgroundColor = 'LightGreen';
-        document.getElementById("belt_monitor_ip").style.backgroundColor = 'LightGreen';
-        console.log('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
-        to_console('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
+        workcell_connected();
     });
 
     ros_workcell.on('error', function(error) {
@@ -198,11 +193,7 @@ function init_ros_workcell() {
     });
 
     ros_workcell.on('close', function() {
-        document.getElementById("onoff_workcell").checked = '';
-        document.getElementById("wc_monitor_ip").style.backgroundColor = 'Red';
-        document.getElementById("belt_monitor_ip").style.backgroundColor = 'Red';
-        console.log('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
-        to_console('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
+        workcell_disconnected();
     });
 
     // Topics on Workcell's CORE
@@ -372,11 +363,7 @@ function frobit_connected() {
 
 function frobit_disconnected() {
     // Frobit info reactions
-    document.getElementById("mr_manual_control_frame").style.visibility = "hidden";
-    document.getElementById("joystick_container").style.visibility = "hidden";
-    document.getElementById("img_safety_button_frobit").src = "img/cant_read_frobit.png";
-    document.getElementById("img_safety_button_frobit").onclick = ""
-    document.getElementById("img_safety_button_frobit").style.cursor = "wait";
+    mr_control_disabled();
     document.getElementById("mr_monitor_mode").innerHTML = "&nbsp;";
     document.getElementById("mr_monitor_mission").innerHTML = "&nbsp;";
     document.getElementById("mr_monitor_position").innerHTML = "&nbsp;";
@@ -384,10 +371,7 @@ function frobit_disconnected() {
     document.getElementById("mr_monitor_angvel").innerHTML = "&nbsp;";
 
     // Tipper info reactions
-    document.getElementById("tipper_manual_control_frame").style.visibility = "hidden";
-    document.getElementById("img_safety_button_tipper").src = "img/cant_read_tipper.png";
-    document.getElementById("img_safety_button_tipper").onclick = ""
-    document.getElementById("img_safety_button_tipper").style.cursor = "wait";
+    tipper_control_disabled();
     document.getElementById("tipper_monitor_mode").innerHTML = "&nbsp;";
     document.getElementById("tipper_monitor_position").innerHTML = "&nbsp;";
 
@@ -396,6 +380,22 @@ function frobit_disconnected() {
     document.getElementById("tipper_monitor_ip").style.backgroundColor = 'Red';
     console.log('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
     to_console('Connection to Frobit\'s ROSCORE on '+ip_frobit+' closed.');
+}
+
+function mr_control_enabled() {
+    document.getElementById("mr_manual_control_frame").style.opacity = 1.0;
+    document.getElementById("mr_man_auto_switch").disabled = '';
+    document.getElementById("img_safety_button_frobit").style.cursor = "pointer";
+    document.getElementById("joystick_container").style.visibility = "visible";
+}
+
+function mr_control_disabled() {
+    document.getElementById("mr_manual_control_frame").style.opacity = 0.5;
+    document.getElementById("mr_man_auto_switch").disabled = 'disabled';
+    document.getElementById("joystick_container").style.visibility = "hidden";
+    document.getElementById("img_safety_button_frobit").src = "img/cant_read_frobit.png";
+    document.getElementById("img_safety_button_frobit").onclick = ""
+    document.getElementById("img_safety_button_frobit").style.cursor = "wait";
 }
 
 /* Initialize joystick for frobit's manual control */
@@ -430,12 +430,6 @@ function init_manual_control_for_frobit() {
     });
     document.getElementById('mr_manual_control_frame').focus();
     put_joystick();
-
-    // Tipper
-    document.getElementById('tipper_slider').min = parseInt(tipper_min);
-    document.getElementById('tipper_slider').max = parseInt(tipper_max);
-    document.getElementById('tipper_slider').step = parseInt(tipper_step);
-    document.getElementById('tipper_slider').value = parseInt(tipper_init);
 }
 
 /* Insert joystick to the page */
@@ -563,6 +557,47 @@ function mr_set_opacity_for_man_control(op) {
 }
 
 /* ---------------------------- WORKCELL ------------------------------------ */
+
+function workcell_connected() {
+    document.getElementById("onoff_workcell").checked = 'checked';
+    document.getElementById("wc_monitor_ip").style.backgroundColor = 'LightGreen';
+    document.getElementById("belt_monitor_ip").style.backgroundColor = 'LightGreen';
+    console.log('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
+    to_console('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');
+}
+
+function workcell_disconnected() {
+    // Workcell's reactions
+    document.getElementById("img_safety_button_workcell").src = "img/cant_read_workcell.png";
+    document.getElementById("img_safety_button_workcell").onclick = ""
+    document.getElementById("img_safety_button_workcell").style.cursor = "wait";
+    document.getElementById("wc_monitor_mode").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_mission").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j0").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j1").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j2").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j3").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j4").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j5").innerHTML = "&nbsp;";
+
+
+    // Belt's reactions
+    document.getElementById("img_safety_button_belt").src = "img/cant_read_belt.png";
+    document.getElementById("img_safety_button_belt").onclick = ""
+    document.getElementById("img_safety_button_belt").style.cursor = "wait";
+    document.getElementById("belt_monitor_mode").innerHTML = "&nbsp;";
+    document.getElementById("belt_monitor_status").innerHTML = "&nbsp;";
+    document.getElementById("belt_monitor_direction").innerHTML = "&nbsp;";
+    document.getElementById("belt_monitor_velocity").innerHTML = "&nbsp;";
+
+    // General reactions
+    document.getElementById("onoff_workcell").checked = '';
+    document.getElementById("wc_monitor_ip").style.backgroundColor = 'Red';
+    document.getElementById("belt_monitor_ip").style.backgroundColor = 'Red';
+    console.log('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
+    to_console('Connection to Workcell\'s ROSCORE on '+ip_workcell+' closed.');
+}
+
 /* Set workcell parameters to the control system */
 function init_manual_control_for_workcell() {
     /* set boundaries and step for each joint */
@@ -676,6 +711,24 @@ function wc_stop_clicked() {
 
 /* ---------------------------- TIPPER ------------------------------------ */
 
+function tipper_control_enabled() {
+    document.getElementById("tipper_manual_control_frame").style.opacity = 1.0;
+    document.getElementById("tipper_man_auto_switch").disabled = '';
+    document.getElementsByClassName("tipper_button")[0].disabled = '';
+    document.getElementsByClassName("tipper_button")[1].disabled = '';
+    document.getElementById("img_safety_button_tipper").style.cursor = "pointer";
+}
+
+function tipper_control_disabled() {
+    document.getElementById("tipper_manual_control_frame").style.opacity = 0.5;
+    document.getElementById("tipper_man_auto_switch").disabled = 'disabled';
+    document.getElementsByClassName("tipper_button")[0].disabled = 'disabled';
+    document.getElementsByClassName("tipper_button")[1].disabled = 'disabled';
+    document.getElementById("img_safety_button_tipper").src = "img/cant_read_frobit.png";
+    document.getElementById("img_safety_button_tipper").onclick = ""
+    document.getElementById("img_safety_button_tipper").style.cursor = "wait";
+}
+
 function tipper_automode_is_true() {
     document.getElementById("tipper_monitor_mode").innerHTML = 'Automode';
     document.getElementById("img_safety_button_tipper").src = "img/stop_tipper.png";
@@ -710,65 +763,94 @@ function tipper_man_auto_changed() {
 }
 
 function tipper_up() {
-    tipper_make_automode_false();
-    var slider = document.getElementById('tipper_slider');
-    var new_val = parseInt(slider.value)+parseInt(tipper_step);
-    if (parseInt(new_val) <= parseInt(slider.max)) {
-        ros_msg_frobit('tipper_move_up');
-        tipper_set_value(slider, new_val);
-    }
+    ros_msg_frobit('tipper_move_up');
 }
 
 function tipper_down() {
-    tipper_make_automode_false();
-    var slider = document.getElementById('tipper_slider');
-    var new_val = parseInt(slider.value)-parseInt(tipper_step);
-    if (parseInt(new_val) >= parseInt(slider.min)) {
-        ros_msg_frobit('tipper_move_down');
-        tipper_set_value(slider, new_val);
-    }
-}
-
-function tipper_set_value(slider, value) {
-    slider.value = value;
-    document.getElementById('tipper_img').src = 'img/frobit_tipper_'+parseInt(4*value/parseInt(slider.max))+'.png'
-    to_console('Tipper moved to '+parseFloat(value)/20);
+    ros_msg_frobit('tipper_move_down');
 }
 
 /* ---------------------------- BELT ------------------------------------ */
+/* Belt automode topic subscribed and evaluated as True */
+function belt_automode_is_true() {
+    document.getElementById("belt_monitor_mode").innerHTML = 'Automode';
+    document.getElementById("img_safety_button_belt").src = "img/stop_belt.png";
+    document.getElementById("img_safety_button_belt").onclick = belt_stop;
+    document.getElementById('belt_man_auto_switch').checked = true;
+    document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 0.5;
+    document.getElementsByClassName('beltdirectionswitch')[0].style.opacity = 0.5;
+    document.getElementsByClassName('beltspeedswitch')[0].style.opacity = 0.5;
+}
+
+/* Belt automode topic subscribed and evaluated as False */
+function belt_automode_is_false() {
+    document.getElementById("belt_monitor_mode").innerHTML = 'Manual control';
+    document.getElementById("img_safety_button_belt").src = "img/run_belt_auto.png";
+    document.getElementById("img_safety_button_belt").onclick = belt_make_automode_true;
+    document.getElementById('belt_man_auto_switch').checked = false;
+    document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 1.0;
+    document.getElementsByClassName('beltdirectionswitch')[0].style.opacity = 1.0;
+    document.getElementsByClassName('beltspeedswitch')[0].style.opacity = 1.0;
+}
+
+/* Change Belt's mode to be Automode */
+function belt_make_automode_true() {
+    ros_msg_workcell('belt_mode_auto');
+}
+
+/* Change Belt's mode to be Manual */
+function belt_make_automode_false() {
+    ros_msg_workcell('belt_mode_manual');
+}
+
 /* Manual-auto control of belt changed */
 function belt_man_auto_changed() {
     if (document.getElementById('belt_man_auto_switch').checked) {
-        ros_msg_workcell('belt_mode_auto');
-        document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 0.5;
+        belt_make_automode_true();
     } else {
-        ros_msg_workcell('belt_mode_manual');
-        document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 1.0;
+        belt_make_automode_false();
     }
 }
 
-function belt_man_control_clicked() {
-    var sw = document.getElementById('belt_man_auto_switch');
-    if (sw.checked) {
-        ros_msg_workcell('belt_mode_manual');
-        sw.checked = false;
-        document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 1.0;
+function belt_call_srv() {
+    var str_control = 'belt_srv';
+    if (document.getElementById('belt_on_off_switch').checked) {
+        srv_control += '_on';
+    } else {
+        srv_control += '_off'
+    }
+
+    if (document.getElementById('belt_direction_switch').checked) {
+        srv_control += '_forward';
+    } else {
+        srv_control += '_backwards'
+    }
+
+    if (document.getElementById('belt_speed_switch').checked) {
+        srv_control += '_slow';
+    } else {
+        srv_control += '_fast'
     }
 }
 
 /* Belt switched on/off */
 function belt_on_off_changed() {
-    belt_man_control_clicked();
+    belt_make_automode_false();
+    belt_call_srv();
+}
+
+/* Belt switched on/off */
+function belt_direction_or_speed_changed() {
+    belt_make_automode_false();
     if (document.getElementById('belt_on_off_switch').checked) {
-        ros_msg_workcell('belt_on');
-    } else {
-        ros_msg_workcell('belt_off');
+        belt_call_srv();
     }
 }
 
-function belt_stop_clicked() {
-    belt_man_control_clicked();
-    ros_msg_workcell('belt_stop');
+function belt_stop() {
+    belt_make_automode_false(); // might be not necessarry
+    document.getElementById('belt_on_off_switch').checked = '';
+    belt_call_srv();    // might not be necessarry
 }
 
 /* ---------------------------- MES-sim ------------------------------------ */

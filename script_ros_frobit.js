@@ -5,8 +5,8 @@ function frobit_init_ros() {
     // Get IP of Frobit Ubuntu on SDU-GUEST
     $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_frobit.txt')+'&callback=?',
         function (data) {
-            //ip_frobit = data.contents;    // Connect HMI to Frobit
-            ip_frobit = '10.125.7.186';     // Test HMI on your computer (put your IP)
+            ip_frobit = data.contents;    // Connect HMI to Frobit
+            //ip_frobit = '10.125.7.186';     // Test HMI on your computer (put your IP)
             frobit_got_ip();
             frobit_connect_roscore();
     });

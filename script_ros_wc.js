@@ -5,8 +5,8 @@ function wc_init_ros() {
     // Get IP of Workcell Ubuntu on SDU-GUEST
     $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_workcell.txt')+'&callback=?',
         function (data) {
-            //ip_workcell = data.contents;      // Connect HMI to Workcel PC
-            ip_workcell = '10.125.7.186';       // Test HMI on your computer (put your IP)
+            ip_workcell = data.contents;      // Connect HMI to Workcel PC
+            //ip_workcell = '10.125.7.186';       // Test HMI on your computer (put your IP)
             wc_got_ip();
             wc_connect_roscore();
     });

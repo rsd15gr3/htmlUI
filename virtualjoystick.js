@@ -144,7 +144,7 @@ VirtualJoystick.prototype._onUp	= function()
 {
 	this._pressed	= false; 
 	this._stickEl.style.display	= "none";
-	frobit_ros_msg('mr_stop');
+	frobit_ros_msg('frobit_stop');
 }
 
 VirtualJoystick.prototype._onDown	= function(x, y)

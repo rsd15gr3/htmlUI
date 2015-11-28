@@ -20,7 +20,7 @@ function frobit_joystick_moved(x0, y0, x, y) {
 function frobit_automode_is_true() {
     document.getElementById("mr_monitor_mode").innerHTML = 'Automode';
     document.getElementById("img_safety_button_frobit").src = "img/stop_frobit.png";
-    document.getElementById("img_safety_button_frobit").onclick = mr_make_automode_false;
+    document.getElementById("img_safety_button_frobit").onclick = frobit_make_automode_false;
     document.getElementById('joystick_base').style.opacity = 0.5;
     document.getElementById('joystick_stick').style.opacity = 0.5;
     document.getElementById('mr_man_auto_switch').checked = true;
@@ -30,7 +30,7 @@ function frobit_automode_is_true() {
 function frobit_automode_is_false() {
     document.getElementById("mr_monitor_mode").innerHTML = 'Manual control';
     document.getElementById("img_safety_button_frobit").src = "img/run_frobit_auto.png";
-    document.getElementById("img_safety_button_frobit").onclick = mr_make_automode_true;
+    document.getElementById("img_safety_button_frobit").onclick = frobit_make_automode_true;
     document.getElementById('joystick_base').style.opacity = 1.0;
     document.getElementById('joystick_stick').style.opacity = 1.0;
     document.getElementById('mr_man_auto_switch').checked = false;

@@ -88,7 +88,7 @@ function wc_ros_connected() {
     document.getElementById("belt_monitor_ip").style.backgroundColor = 'LightGreen';
 
     // Enable control of Kuka
-    document.getElementById("wc_mc_table").style.opacity = 1.0;
+    document.getElementById("wc_manual_control_frame").style.opacity = 1.0;
     document.getElementById("img_safety_button_wc").style.cursor = "pointer";
     document.getElementById("wc_man_auto_switch").disabled = '';
     var btns = document.getElementsByClassName("wc_mc_table_button");
@@ -127,10 +127,10 @@ function wc_ros_disconnected() {
     document.getElementById("wc_monitor_j5").innerHTML = "&nbsp;";
 
     // Workcell Control Options
-    document.getElementById("wc_mc_table").style.opacity = 0.5;
-    document.getElementById("img_safety_button_workcell").src = "img/cant_read_workcell.png";
-    document.getElementById("img_safety_button_workcell").onclick = ""
-    document.getElementById("img_safety_button_workcell").style.cursor = "wait";
+    document.getElementById("wc_manual_control_frame").style.opacity = 0.5;
+    document.getElementById("img_safety_button_wc").src = "img/cant_read_workcell.png";
+    document.getElementById("img_safety_button_wc").onclick = ""
+    document.getElementById("img_safety_button_wc").style.cursor = "wait";
     document.getElementById("wc_man_auto_switch").disabled = 'disabled';
     var btns = document.getElementsByClassName("wc_mc_table_button");
     for(var i = 0; i < btns.length; i++) {

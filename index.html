@@ -12,7 +12,13 @@
         <script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
         <script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
         <script src="jquery-1.11.3.js"></script>
-        <script src="script.js"></script>
+        <script src="script_main.js"></script>
+        <script src="script_ros_frobit.js"></script>
+        <script src="script_frobit.js"></script>
+        <script src="script_tipper.js"></script>
+        <script src="script_ros_wc.js"></script>
+        <script src="script_wc.js"></script>
+        <script src="script_belt.js"></script>
         <script src="virtualjoystick.js"></script>
         <script type="text/javascript">
             /* ---------------- Define global parameters for all scripts --------------------- */
@@ -49,35 +55,38 @@
 
             /* ---------------- Define global variables for all scripts --------------------- */
             var joystick;
-            var ip_frobit;
-            var ip_workcell;
 
             // ROS cores
+            var ip_frobit;
+            var ip_workcell;
             var ros_frobit;
             var ros_workcell;
+            var frobit_monitor_interval;
+            var wc_monitor_interval;
+            var wc_kuka_conf_interval;
 
-            // Topics on Frobit
-            var ui_str_control_frobit_topic;
-            var cmd_vel_topic;
-            var control_mode_frobit_topic;
-            var mr_usbcam_topic;
-            var ui_mes_frobit_topic;
-            var frobit_next_mission_topic;
-            var tipper_automode_topic;
-            var tipper_position_topic;
+            // Frobit's core
+            var frobit_tp_ui_str_control;
+            var frobit_tp_cmd_vel;
+            var frobit_tp_automode;
+            var frobit_tp_usbcam;
+            var frobit_tp_mes_control;
+            var frobit_tp_next_mission;
+            var tipper_tp_automode;
+            var tipper_tp_answer;
 
-            // Topics on Workcell
-            var ui_wc_str_control_topic;
-            var wc_usbcam_topic;
+            var frobit_srv_topics;
+            var frobit_srv_nodes;
+            var frobit_srv_services;
 
-            // ROS structures
-            var topics_client_frobit_service;
-            var nodes_client_frobit_service;
-            var services_client_frobit_service;
-            var topics_client_workcell_service;
-            var nodes_client_workcell_service;
-            var services_client_workcell_service;
-            var getconf_client_workcell_service;
+            // Workcell's core
+            var wc_tp_ui_str_control;
+            var wc_tp_usbcam;
+
+            var wc_srv_getconf;
+            var wc_srv_topics;
+            var wc_srv_nodes;
+            var wc_srv_services;
         </script>
     </head>
     <body onload="on_loaded_page()">
@@ -127,7 +136,7 @@
                 <section id="tabs_content1"  class="tabs_sections">
                     <div id="mr_manual_control_frame" class="control_frame" tabindex="0">
                          <div class="automanualswitch">
-                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="mr_man_auto_changed();" disabled />
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="mr_man_auto_switch" onclick="frobit_man_auto_changed();" disabled />
                             <label class="automanualswitch-label" for="mr_man_auto_switch">
                                 <span class="automanualswitch-inner"></span>
                                 <span class="automanualswitch-switch"></span>
@@ -165,14 +174,14 @@
                         <table id="tipper_control_table" cellspacing="5">
                             <tr>
                                 <td>
-                                    <img id="tipper_img" src="img/frobit_tipper_0.png" />
+                                    <img id="tipper_img" src="" />
                                 </td>
                                 <td id="tipper_manual_frame">
-                                    <input class="tipper_button" type="button" value="UP" onclick="tipper_up();" disabled />
+                                    <input class="tipper_button" type="button" value="TIPPING" onclick="tipper_make_tipping();" disabled />
                                     <br />
-                                    <input id="tipper_slider" type="range" min=0 max=2 step=1 value=0 orient="vertical" disabled />
+                                    <input id="tipper_slider" type="range" min=0 max=2 value=0 orient="vertical" disabled />
                                     <br />
-                                    <input class="tipper_button" type="button" value="DOWN" onclick="tipper_down();" disabled />
+                                    <input class="tipper_button" type="button" value="IDLE" onclick="tipper_make_idle();" disabled />
                                 </td>
                             </tr>
                         </table>
@@ -254,15 +263,6 @@
                                 <td id="wc_mc_max_j5" class="wc_mc_table_value">&nbsp;</td>
                                 <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j5')" /></td>
                             </tr>
-                            <tr><th>G</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('g')" disabled /></td>
-                                <td id="wc_mc_min_g" class="wc_mc_table_value">&nbsp;</td>
-                                <td>
-                                    <input id="wc_mc_slider_g"  class="wc_mc_table_slider" type="range" disabled />
-                                </td>
-                                <td id="wc_mc_max_g" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('g')" disabled /></td>
-                            </tr>
                         </table>
                     </div>
                     <div class="monitor_frame">
@@ -284,9 +284,9 @@
                 </section>
 
                 <section id="tabs_content4"  class="tabs_sections">
-                    <div class="control_frame">
+                    <div class="control_frame" id="belt_manual_control_frame">
                          <div class="automanualswitch">
-                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="belt_man_auto_switch" onclick="belt_man_auto_changed();">
+                            <input type="checkbox" name="automanualswitch" class="automanualswitch-checkbox" id="belt_man_auto_switch" onclick="belt_man_auto_changed();" disabled />
                             <label class="automanualswitch-label" for="belt_man_auto_switch">
                                 <span class="automanualswitch-inner"></span>
                                 <span class="automanualswitch-switch"></span>
@@ -294,7 +294,7 @@
                          </div>
 
                         <div id="belt_on_off_switch_div" class="beltonoffswitch">
-                            <input type="checkbox" name="beltonoffswitch" class="beltonoffswitch-checkbox" id="belt_on_off_switch" onclick="belt_on_off_changed();">
+                            <input type="checkbox" name="beltonoffswitch" class="beltonoffswitch-checkbox" id="belt_on_off_switch" onclick="belt_call_srv();" disabled />
                             <label class="beltonoffswitch-label" for="belt_on_off_switch">
                                 <span class="beltonoffswitch-inner"></span>
                                 <span class="beltonoffswitch-switch"></span>
@@ -302,7 +302,7 @@
                         </div>
 
                         <div id="belt_direction_switch_div" class="beltdirectionswitch">
-                            <input type="checkbox" name="beltdirectionswitch" class="beltdirectionswitch-checkbox" id="belt_direction_switch" onclick="belt_direction_changed();" checked>
+                            <input type="checkbox" name="beltdirectionswitch" class="beltdirectionswitch-checkbox" id="belt_direction_switch" onclick="belt_settings_changed();" checked disabled />
                             <label class="beltdirectionswitch-label" for="belt_direction_switch">
                                 <span class="beltdirectionswitch-inner"></span>
                                 <span class="beltdirectionswitch-switch"></span>
@@ -310,7 +310,7 @@
                         </div>
 
                         <div id="belt_speed_switch_div" class="beltspeedswitch">
-                            <input type="checkbox" name="beltspeedswitch" class="beltspeedswitch-checkbox" id="belt_speed_switch" onclick="belt_speed_changed();" checked>
+                            <input type="checkbox" name="beltspeedswitch" class="beltspeedswitch-checkbox" id="belt_speed_switch" onclick="belt_settings_changed();" checked disabled />
                             <label class="beltspeedswitch-label" for="belt_speed_switch">
                                 <span class="beltspeedswitch-inner"></span>
                                 <span class="beltspeedswitch-switch"></span>
@@ -395,7 +395,7 @@
             <div id="safety_buttons_frame">
                 <img id="img_safety_button_frobit" class="img_safety_button" src="img/cant_read_frobit.png" />
                 <img id="img_safety_button_tipper" class="img_safety_button" src="img/cant_read_tipper.png" />
-                <img id="img_safety_button_workcell" class="img_safety_button" src="img/cant_read_workcell.png" />
+                <img id="img_safety_button_wc" class="img_safety_button" src="img/cant_read_workcell.png" />
                 <img id="img_safety_button_belt" class="img_safety_button" src="img/cant_read_belt.png" />
             </div>
         </div>

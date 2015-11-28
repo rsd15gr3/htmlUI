@@ -144,7 +144,7 @@ VirtualJoystick.prototype._onUp	= function()
 {
 	this._pressed	= false; 
 	this._stickEl.style.display	= "none";
-	ros_msg_frobit('mr_stop');
+	frobit_ros_msg('mr_stop');
 }
 
 VirtualJoystick.prototype._onDown	= function(x, y)
@@ -189,7 +189,7 @@ VirtualJoystick.prototype._onMove	= function(x, y)
 				this._stickY = stickNormalizedY * this._stickRadius + this._baseY;
 			} 		
 		}
-		    joystick_moved(this._baseX, this._baseY, x, y);
+		    frobit_joystick_moved(this._baseX, this._baseY, x, y);
         	this._move(this._stickEl.style, (this._stickX - this._stickEl.width /2), (this._stickY - this._stickEl.height/2));	
 	}
 }

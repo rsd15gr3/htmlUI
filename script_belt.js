@@ -13,7 +13,7 @@ function belt_make_automode_false() {
 function belt_automode_is_true() {
     document.getElementById("belt_monitor_mode").innerHTML = 'Automode';
     document.getElementById("img_safety_button_belt").src = "img/stop_belt.png";
-    document.getElementById("img_safety_button_belt").onclick = belt_stop;
+    document.getElementById("img_safety_button_belt").onclick = belt_make_automode_false;
     document.getElementById('belt_man_auto_switch').checked = true;
     document.getElementsByClassName('beltonoffswitch')[0].style.opacity = 0.5;
     document.getElementsByClassName('beltdirectionswitch')[0].style.opacity = 0.5;
@@ -63,14 +63,17 @@ function belt_man_auto_changed() {
     }
 }
 
+function belt_got_mode(message) {
+    if (message.data == true) {
+        belt_automode_is_true();
+    } else if (message.data == false) {
+        belt_automode_is_false();
+    }
+}
+
 /* Belt switched on/off */
 function belt_settings_changed() {
     if (document.getElementById('belt_on_off_switch').checked) {
         belt_call_srv();
     }
-}
-
-function belt_stop() {
-    document.getElementById('belt_on_off_switch').checked = '';
-    belt_call_srv();    // might not be necessarry
 }

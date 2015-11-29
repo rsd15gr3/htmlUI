@@ -96,8 +96,3 @@ function to_console(text) {
     ta.value += "\n=> "+text;
     ta.scrollTop = ta.scrollHeight;
 }
-
-function on_mes_frobit_change(value) {
-    var msg = new ROSLIB.Message({data : value});
-    ui_mes_frobit_topic.publish(msg);
-}

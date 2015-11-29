@@ -14,9 +14,9 @@
         <script src="jquery-1.11.3.js"></script>
         <script src="script_main.js"></script>
         <script src="script_ros_frobit.js"></script>
+        <script src="script_ros_wc.js"></script>
         <script src="script_frobit.js"></script>
         <script src="script_tipper.js"></script>
-        <script src="script_ros_wc.js"></script>
         <script src="script_wc.js"></script>
         <script src="script_belt.js"></script>
         <script src="virtualjoystick.js"></script>
@@ -81,7 +81,9 @@
 
             // Workcell's core
             var wc_tp_ui_str_control;
+            var wc_tp_automode;
             var wc_tp_usbcam;
+            var belt_tp_automode;
 
             var wc_srv_getconf;
             var wc_srv_topics;
@@ -348,7 +350,7 @@
                     <table class="tab_divide_table" cellspacing="5" cellpadding="5">
                         <tr><th>Frobit's Topics</th><th>Workcell's Topics</th></tr>
                         <tr><td id="ros_mr_topics">&nbsp;</td><td id="ros_wc_topics">&nbsp;</td></tr>
-                        <tr><th>Frobit's Active Nodes</th><th>Workcell's Active Nodes</th></tr>
+                        <tr><th>Frobit's Nodes</th><th>Workcell's Nodes</th></tr>
                         <tr><td id="ros_mr_nodes">&nbsp;</td><td id="ros_wc_nodes">&nbsp;</td></tr>
                         <tr><th>Frobit's Services</th><th>Workcell's Services</th></tr>
                         <tr><td id="ros_mr_services">&nbsp;</td><td id="ros_wc_services">&nbsp;</td></tr>

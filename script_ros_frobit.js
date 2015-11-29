@@ -241,3 +241,8 @@ function frobit_update_ros_structure() {
         console.log(err.message);
     }
 }
+
+function on_mes_frobit_change(value) {
+    var msg = new ROSLIB.Message({data : value});
+    frobit_tp_mes_control.publish(msg);
+}

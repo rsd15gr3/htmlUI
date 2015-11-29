@@ -3,6 +3,7 @@
 html {
     background-color: LightGray;
     font-family: fontawesome;
+    overflow-y: scroll;
 }
 
 input[type=range][orient=vertical]
@@ -127,6 +128,7 @@ table.tab_divide_table td {
 
 /* --------------------------------------- TAB0 : Frobit (mr : mobile robot)------------------------------------- */
 #mr_manual_control_frame {
+    opacity: 0.5;
     height: 285px;
 }
 
@@ -146,6 +148,10 @@ table.tab_divide_table td {
 }
 
 /* --------------------------------------- TAB1 : Workcell (wc : work cell)------------------------------------- */
+
+#wc_manual_control_frame {
+    opacity: 0.5;
+}
 
 #wc_mc_table {
     position: relative;
@@ -177,6 +183,10 @@ table#wc_mc_table th {
 
 /* --------------------------------------- TAB2 : Tipper (tipper) ------------------------------------- */
 
+#tipper_manual_control_frame {
+    opacity: 0.5;
+}
+
 #tipper_control_table {
     width: 300px;
     margin-top: 10px;
@@ -207,6 +217,10 @@ table#wc_mc_table th {
 }
 
 /* --------------------------------------- TAB3 : Belt (belt) ------------------------------------- */
+#belt_manual_control_frame {
+    opacity: 0.5;
+}
+
 #belt_on_off_switch_div {
     position: absolute;
     margin-top: 10px;

@@ -38,15 +38,37 @@ function wc_connect_roscore() {
         messageType : 'std_msgs/String'
     });
 
+    wc_tp_automode = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/ui/wc_automode',
+        messageType : 'msgs/BoolStamped'
+    });
+
     wc_tp_usbcam = new ROSLIB.Topic({
         ros : ros_workcell,
         name : '/usb_cam/image_raw/compressed',
         messageType : 'sensor_msgs/CompressedImage'
     });
 
+    belt_tp_automode = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/ui/belt_automode',
+        messageType : 'msgs/BoolStamped'
+    });
+
+    // Workcell control mode
+    wc_tp_automode.subscribe(function(message) {
+        wc_got_mode(message);
+    });
+
     // Image from WC usbcam
     wc_tp_usbcam.subscribe(function(message) {
         document.getElementById("cam_wc_img").src = "data:image/png;base64,"+message.data;
+    });
+
+    // Belt control mode
+    belt_tp_automode.subscribe(function(message) {
+        belt_got_mode(message);
     });
 
     // Services on WC core
@@ -73,6 +95,12 @@ function wc_connect_roscore() {
         name : '/rosapi/services',
         serviceType : 'rosapi/Services'
     });
+
+    // Monitor Workcell's ROS structure, [ms]
+    wc_monitor_interval = setInterval(wc_update_ros_structure, 1000);
+
+    // Update Kuka configuration every 50 ms
+    wc_kuka_conf_interval = setInterval(wc_update_kuka_conf, 50);
 }
 
 function wc_got_ip() {
@@ -103,12 +131,6 @@ function wc_ros_connected() {
     document.getElementById("belt_on_off_switch").disabled = '';
     document.getElementById("belt_direction_switch").disabled = '';
     document.getElementById("belt_speed_switch").disabled = '';
-
-    // Monitor Workcell's ROS structure, [ms]
-    wc_monitor_interval = setInterval(wc_update_ros_structure, 1000);
-
-    // Update Kuka configuration every 50 ms
-    wc_kuka_conf_interval = setInterval(wc_update_kuka_conf, 50);
 
     // Console Info
     console.log('Connected to Workcell\'s ROSCORE on '+ip_workcell+'.');

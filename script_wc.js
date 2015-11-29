@@ -39,7 +39,7 @@ function wc_mc_joint_down(joint_id) {
     var slider = document.getElementById('wc_mc_slider_'+joint_id);
     var new_val = parseFloat(slider.value)-parseFloat(wc_mc_joint_step);
     if (parseFloat(new_val) >= parseFloat(slider.min)) {
-        wc_ros_msg('wc_joint_'+joint_id+'_d');
+        wc_ros_msg('wc_joint_'+joint_id+'_down');
         to_console('WC: Joint '+joint_id+' set to '+new_val);
     }
 }
@@ -49,8 +49,16 @@ function wc_mc_joint_up(joint_id) {
     var slider = document.getElementById('wc_mc_slider_'+joint_id);
     var new_val = parseFloat(slider.value)+parseFloat(wc_mc_joint_step);
     if (parseFloat(new_val) <= parseFloat(slider.max)) {
-        wc_ros_msg('wc_joint_'+joint_id+'_u');
+        wc_ros_msg('wc_joint_'+joint_id+'_up');
         to_console('WC: Joint '+joint_id+' set to '+new_val);
+    }
+}
+
+function wc_got_mode(message) {
+    if (message.data == true) {
+        wc_automode_is_true();
+    } else if (message.data == false) {
+        wc_automode_is_false();
     }
 }
 

@@ -74,24 +74,30 @@ function belt_got_mode(message) {
 function belt_got_status(message) {
     if (message.data == true) {
         document.getElementById("belt_monitor_status").innerHTML = "On"
+        document.getElementById("belt_on_off_switch").checked = true;
     } else if (message.data == false) {
         document.getElementById("belt_monitor_status").innerHTML = "Off"
+        document.getElementById("belt_on_off_switch").checked = false;
     }
 }
 
 function belt_got_direction(message) {
     if (message.data == true) {
         document.getElementById("belt_monitor_direction").innerHTML = "Forward"
+        document.getElementById("belt_direction_switch").checked = true;
     } else if (message.data == false) {
         document.getElementById("belt_monitor_direction").innerHTML = "Backwards"
+        document.getElementById("belt_direction_switch").checked = false;
     }
 }
 
 function belt_got_speed(message) {
     if (message.data == 1) {
         document.getElementById("belt_monitor_speed").innerHTML = "1 : Fast"
+        document.getElementById("belt_speed_switch").checked = false;
     } else if (message.data == 2) {
         document.getElementById("belt_monitor_speed").innerHTML = "2 : Slow"
+        document.getElementById("belt_speed_switch").checked = true;
     }
 }
 

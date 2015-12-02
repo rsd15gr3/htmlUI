@@ -116,7 +116,7 @@ function wc_init_manual_control() {
 }
 
 /* Sets KUKA configuration after reading it */
-function wc_set_kuka_configuration(q) {
+function wc_update_kuka_configuration(q) {
     // Sliders
     document.getElementById('wc_mc_slider_j0').value = parseFloat(q[0]);
     document.getElementById('wc_mc_slider_j1').value = parseFloat(q[1]);

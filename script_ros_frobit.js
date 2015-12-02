@@ -189,7 +189,7 @@ function frobit_ros_disconnected() {
     document.getElementById("tipper_man_auto_switch").disabled = 'disabled';
     document.getElementsByClassName("tipper_button")[0].disabled = 'disabled';
     document.getElementsByClassName("tipper_button")[1].disabled = 'disabled';
-    document.getElementById("img_safety_button_tipper").src = "img/cant_read_frobit.png";
+    document.getElementById("img_safety_button_tipper").src = "img/cant_read_tipper.png";
     document.getElementById("img_safety_button_tipper").onclick = ""
     document.getElementById("img_safety_button_tipper").style.cursor = "wait";
 

@@ -84,6 +84,9 @@
             var wc_tp_automode;
             var wc_tp_usbcam;
             var belt_tp_automode;
+            var belt_tp_activated;
+            var belt_tp_forward;
+            var belt_tp_speed;
 
             var wc_srv_getconf;
             var wc_srv_topics;
@@ -312,7 +315,7 @@
                         </div>
 
                         <div id="belt_speed_switch_div" class="beltspeedswitch">
-                            <input type="checkbox" name="beltspeedswitch" class="beltspeedswitch-checkbox" id="belt_speed_switch" onclick="belt_settings_changed();" checked disabled />
+                            <input type="checkbox" name="beltspeedswitch" class="beltspeedswitch-checkbox" id="belt_speed_switch" onclick="belt_settings_changed();" disabled />
                             <label class="beltspeedswitch-label" for="belt_speed_switch">
                                 <span class="beltspeedswitch-inner"></span>
                                 <span class="beltspeedswitch-switch"></span>
@@ -331,7 +334,7 @@
                             <tr><th>Control Mode [auto/man]:</th><td id="belt_monitor_mode">&nbsp;</td></tr>
                             <tr><th>Status:</th><td id="belt_monitor_status">&nbsp;</td></tr>
                             <tr><th>Direction:</th><td id="belt_monitor_direction">&nbsp;</td></tr>
-                            <tr><th>Velocity:</th><td id="belt_monitor_velocity">&nbsp;</td></tr>
+                            <tr><th>Speed:</th><td id="belt_monitor_speed">&nbsp;</td></tr>
                         </table>
                     </div>
                 </section>

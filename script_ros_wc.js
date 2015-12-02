@@ -6,7 +6,7 @@ function wc_init_ros() {
     $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_workcell.txt')+'&callback=?',
         function (data) {
             ip_workcell = data.contents;      // Connect HMI to Workcel PC
-            //ip_workcell = '10.125.7.186';       // Test HMI on your computer (put your IP)
+            //ip_workcell = '10.125.5.72';       // Test HMI on your computer (put your IP)
             wc_got_ip();
             wc_connect_roscore();
     });
@@ -39,7 +39,7 @@ function wc_connect_roscore() {
     });
 
     wc_tp_automode = new ROSLIB.Topic({
-        ros : ros_frobit,
+        ros : ros_workcell,
         name : '/ui/wc_automode',
         messageType : 'msgs/BoolStamped'
     });
@@ -51,9 +51,27 @@ function wc_connect_roscore() {
     });
 
     belt_tp_automode = new ROSLIB.Topic({
-        ros : ros_frobit,
+        ros : ros_workcell,
         name : '/ui/belt_automode',
         messageType : 'msgs/BoolStamped'
+    });
+
+    belt_tp_activated = new ROSLIB.Topic({
+        ros : ros_workcell,
+        name : '/ui/belt_activated',
+        messageType : 'msgs/BoolStamped'
+    });
+
+    belt_tp_forward = new ROSLIB.Topic({
+        ros : ros_workcell,
+        name : '/ui/belt_forward',
+        messageType : 'msgs/BoolStamped'
+    });
+
+    belt_tp_speed = new ROSLIB.Topic({
+        ros : ros_workcell,
+        name : '/ui/belt_speed',
+        messageType : 'msgs/IntStamped'
     });
 
     // Workcell control mode
@@ -69,6 +87,21 @@ function wc_connect_roscore() {
     // Belt control mode
     belt_tp_automode.subscribe(function(message) {
         belt_got_mode(message);
+    });
+
+    // Belt status
+    belt_tp_activated.subscribe(function(message) {
+        belt_got_status(message);
+    });
+
+    // Belt direction
+    belt_tp_forward.subscribe(function(message) {
+        belt_got_direction(message);
+    });
+
+    // Belt speed
+    belt_tp_speed.subscribe(function(message) {
+        belt_got_speed(message);
     });
 
     // Services on WC core
@@ -100,7 +133,7 @@ function wc_connect_roscore() {
     wc_monitor_interval = setInterval(wc_update_ros_structure, 1000);
 
     // Update Kuka configuration every 50 ms
-    wc_kuka_conf_interval = setInterval(wc_update_kuka_conf, 50);
+    //wc_kuka_conf_interval = setInterval(wc_update_kuka_conf, 50);
 }
 
 function wc_got_ip() {
@@ -201,8 +234,8 @@ function wc_ros_msg(data_str) {
 function wc_update_kuka_conf() {
     try {
         wc_srv_getconf.callService(new ROSLIB.ServiceRequest(), function(result) {
-            console.log(result.q[0]);
-            wc_set_kuka_configuration(result.q);
+            //console.log(result.q[0]);
+            wc_update_kuka_configuration(result.q);
         });
     } catch (err) {
         console.log(err.message);

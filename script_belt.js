@@ -71,6 +71,30 @@ function belt_got_mode(message) {
     }
 }
 
+function belt_got_status(message) {
+    if (message.data == true) {
+        document.getElementById("belt_monitor_status").innerHTML = "On"
+    } else if (message.data == false) {
+        document.getElementById("belt_monitor_status").innerHTML = "Off"
+    }
+}
+
+function belt_got_direction(message) {
+    if (message.data == true) {
+        document.getElementById("belt_monitor_direction").innerHTML = "Forward"
+    } else if (message.data == false) {
+        document.getElementById("belt_monitor_direction").innerHTML = "Backwards"
+    }
+}
+
+function belt_got_speed(message) {
+    if (message.data == 1) {
+        document.getElementById("belt_monitor_speed").innerHTML = "1 : Fast"
+    } else if (message.data == 2) {
+        document.getElementById("belt_monitor_speed").innerHTML = "2 : Slow"
+    }
+}
+
 /* Belt switched on/off */
 function belt_settings_changed() {
     if (document.getElementById('belt_on_off_switch').checked) {

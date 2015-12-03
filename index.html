@@ -23,35 +23,31 @@
         <script type="text/javascript">
             /* ---------------- Define global parameters for all scripts --------------------- */
             // WorkCell
-            var wc_mc_joint_step = 0.1;
+            var wc_mc_joint_step = 10;  // degrees
 
-            var wc_mc_j0_min = -1.0;
-            var wc_mc_j0_max = 1.0;
-            var wc_mc_j0_init = 0.5;
+            var wc_mc_j0_min = -170.0;
+            var wc_mc_j0_max = 170.0;
+            var wc_mc_j0_init = 0.0;
 
-            var wc_mc_j1_min = -1.0;
-            var wc_mc_j1_max = 1.0;
-            var wc_mc_j1_init = 0.5;
+            var wc_mc_j1_min = -100.0;
+            var wc_mc_j1_max = 135.0;
+            var wc_mc_j1_init = 0.0;
 
-            var wc_mc_j2_min = -1.0;
-            var wc_mc_j2_max = 1.0;
-            var wc_mc_j2_init = 0.5;
+            var wc_mc_j2_min = -200.0;
+            var wc_mc_j2_max = 60.0;
+            var wc_mc_j2_init = 0.0;
 
-            var wc_mc_j3_min = -1.0;
-            var wc_mc_j3_max = 1.0;
-            var wc_mc_j3_init = 0.5;
+            var wc_mc_j3_min = -185.0;
+            var wc_mc_j3_max = 185.0;
+            var wc_mc_j3_init = 0.0;
 
-            var wc_mc_j4_min = -1.0;
-            var wc_mc_j4_max = 1.0;
-            var wc_mc_j4_init = 0.5;
+            var wc_mc_j4_min = -210.0;
+            var wc_mc_j4_max = 25.0;
+            var wc_mc_j4_init = 0.0;
 
-            var wc_mc_j5_min = -1.0;
-            var wc_mc_j5_max = 1.0;
-            var wc_mc_j5_init = 0.5;
-
-            var wc_mc_g_min = -1.0;
-            var wc_mc_g_max = 1.0;
-            var wc_mc_g_init = 0.5;
+            var wc_mc_j5_min = -350.0;
+            var wc_mc_j5_max = 350.0;
+            var wc_mc_j5_init = 0.0;
 
             /* ---------------- Define global variables for all scripts --------------------- */
             var joystick;
@@ -83,15 +79,20 @@
             var wc_tp_ui_str_control;
             var wc_tp_automode;
             var wc_tp_usbcam;
+            var wc_tp_mes_control;
             var belt_tp_automode;
             var belt_tp_activated;
             var belt_tp_forward;
             var belt_tp_speed;
 
             var wc_srv_getconf;
+            var wc_srv_setconf;
             var wc_srv_topics;
             var wc_srv_nodes;
             var wc_srv_services;
+
+            var current_kuka_configuration;
+            var kuka_deadman = false;
         </script>
     </head>
     <body onload="on_loaded_page()">
@@ -138,6 +139,7 @@
                 <input id="input_tab7" type="radio" name="tabs" class="tabs_inputs" onclick="tabs_clicked();">
                 <label for="input_tab7" class="tabs_labels">MES (sim)</label>
 
+                <!-- section 1 : Frobit -->
                 <section id="tabs_content1"  class="tabs_sections">
                     <div id="mr_manual_control_frame" class="control_frame" tabindex="0">
                          <div class="automanualswitch">
@@ -167,6 +169,7 @@
                     </div>
                 </section>
 
+                <!-- section 2 : Tipper -->
                 <section id="tabs_content2"  class="tabs_sections">
                     <div id="tipper_manual_control_frame" class="control_frame">
                         <div class="automanualswitch">
@@ -204,6 +207,7 @@
                     </div>
                 </section>
 
+                <!-- section 3 : Workcell -->
                 <section id="tabs_content3"  class="tabs_sections">
                     <div class="control_frame" id="wc_manual_control_frame">
                         <div class="automanualswitch">
@@ -214,59 +218,65 @@
                             </label>
                         </div>
                         <table id="wc_mc_table" cellspacing="5">
+                            <tr><td id="wc_mc_step_td" colspan="6">&nbsp;</td></tr>
                             <tr><th>j0</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('j0')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down(0)" /></td>
                                 <td id="wc_mc_min_j0" class="wc_mc_table_value">&nbsp;</td>
                                 <td>
                                     <input id="wc_mc_slider_j0"  class="wc_mc_table_slider" type="range" disabled />
                                 </td>
                                 <td id="wc_mc_max_j0" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j0')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up(0)" /></td>
                             </tr>
                             <tr><th>j1</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('j1')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down(1)" /></td>
                                 <td id="wc_mc_min_j1" class="wc_mc_table_value">&nbsp;</td>
                                 <td>
                                     <input id="wc_mc_slider_j1"  class="wc_mc_table_slider" type="range" disabled />
                                 </td>
                                 <td id="wc_mc_max_j1" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j1')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up(1)" /></td>
                             </tr>
                             <tr><th>j2</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('j2')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down(2)" /></td>
                                 <td id="wc_mc_min_j2" class="wc_mc_table_value">&nbsp;</td>
                                 <td>
                                     <input id="wc_mc_slider_j2"  class="wc_mc_table_slider" type="range" disabled />
                                 </td>
                                 <td id="wc_mc_max_j2" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j2')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up(2)" /></td>
                             </tr>
                             <tr><th>j3</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('j3')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down(3)" /></td>
                                 <td id="wc_mc_min_j3" class="wc_mc_table_value">&nbsp;</td>
                                 <td>
                                     <input id="wc_mc_slider_j3"  class="wc_mc_table_slider" type="range" disabled />
                                 </td>
                                 <td id="wc_mc_max_j3" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j3')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up(3)" /></td>
                             </tr>
                             <tr><th>j4</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('j4')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down(4)" /></td>
                                 <td id="wc_mc_min_j4" class="wc_mc_table_value">&nbsp;</td>
                                 <td>
                                     <input id="wc_mc_slider_j4"  class="wc_mc_table_slider" type="range" disabled />
                                 </td>
                                 <td id="wc_mc_max_j4" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j4')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up(4)" /></td>
                             </tr>
                             <tr><th>j5</th>
-                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down('j5')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="-" onclick="wc_mc_joint_down(5)" /></td>
                                 <td id="wc_mc_min_j5" class="wc_mc_table_value">&nbsp;</td>
                                 <td>
                                     <input id="wc_mc_slider_j5"  class="wc_mc_table_slider" type="range" disabled />
                                 </td>
                                 <td id="wc_mc_max_j5" class="wc_mc_table_value">&nbsp;</td>
-                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up('j5')" /></td>
+                                <td><input class="wc_mc_table_button" type="button" value="+" onclick="wc_mc_joint_up(5)" /></td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">
+                                    <input id="wc_mc_go_to_init_button" type="button" value="Go to initial position" onclick="wc_mc_init_pos()" />
+                                </td>
                             </tr>
                         </table>
                     </div>
@@ -288,6 +298,7 @@
                     </div>
                 </section>
 
+                <!-- section 4 : Belt -->
                 <section id="tabs_content4"  class="tabs_sections">
                     <div class="control_frame" id="belt_manual_control_frame">
                          <div class="automanualswitch">
@@ -339,6 +350,7 @@
                     </div>
                 </section>
 
+                <!-- section 5 : Cameras -->
                 <section id="tabs_content5"  class="tabs_sections">
                     <table class="tab_divide_table" cellspacing="5">
                         <tr><th>Frobit's USB Camera</th><th>Workcell's USB Camera</th></tr>
@@ -349,6 +361,7 @@
                     </table>
                 </section>
 
+                <!-- section 6 : ROS -->
                 <section id="tabs_content6"  class="tabs_sections">
                     <table class="tab_divide_table" cellspacing="5" cellpadding="5">
                         <tr><th>Frobit's Topics</th><th>Workcell's Topics</th></tr>
@@ -360,35 +373,52 @@
                     </table>
                 </section>
 
+                <!-- section 7 : MES -->
                 <section id="tabs_content7" class="tabs_sections">
                     <table class="tab_divide_table" cellspacing="5" cellpadding="5">
                         <tr><th>Set a mission for Frobit</th><th>Set a mission for Workcell</th></tr>
-                        <tr><td id="mes_mr_cell">
-                            <div id="mes_mr_next_mission_div">
+                        <tr><td class="mes_td">
+                            <div id="mes_mr_next_mission_div" class="mes_next_mission_div">
                                 <i>Next mission not known yet.</i>
                             </div>
                             <div class="mes_rb_div">
                                 <input type="radio" name="mes_mr_radio" id="mes_mr_radio1" class="mes_rb_input" checked/>
-                                <label for="mes_mr_radio1" class="mes_rb_label" onclick="on_mes_frobit_change(1);">BRICK_ORDER_1 <span class="mes_rb_intspan">(1)</span></label>
+                                <label for="mes_mr_radio1" class="mes_rb_label" onclick="frobit_on_mes_change(1);">BRICK_ORDER_1 <span class="mes_rb_intspan">(1)</span></label>
                             </div>
 
                             <div class="mes_rb_div">
                                 <input type="radio" name="mes_mr_radio" id="mes_mr_radio2" class="mes_rb_input"/>
-                                <label for="mes_mr_radio2" class="mes_rb_label" onclick="on_mes_frobit_change(2);">BRICK_ORDER_2 <span class="mes_rb_intspan">(2)</span></label>
+                                <label for="mes_mr_radio2" class="mes_rb_label" onclick="frobit_on_mes_change(2);">BRICK_ORDER_2 <span class="mes_rb_intspan">(2)</span></label>
                             </div>
 
                             <div class="mes_rb_div">
                                 <input type="radio" name="mes_mr_radio" id="mes_mr_radio3" class="mes_rb_input"/>
-                                <label for="mes_mr_radio3" class="mes_rb_label" onclick="on_mes_frobit_change(3);">BRICK_ORDER_3 <span class="mes_rb_intspan">(3)</span></label>
+                                <label for="mes_mr_radio3" class="mes_rb_label" onclick="frobit_on_mes_change(3);">BRICK_ORDER_3 <span class="mes_rb_intspan">(3)</span></label>
                             </div>
 
                             <div class="mes_rb_div">
                                 <input type="radio" name="mes_mr_radio" id="mes_mr_radio4" class="mes_rb_input"/>
-                                <label for="mes_mr_radio4" class="mes_rb_label" onclick="on_mes_frobit_change(4);">DELIVERY <span class="mes_rb_intspan">(4)</span></label>
+                                <label for="mes_mr_radio4" class="mes_rb_label" onclick="frobit_on_mes_change(4);">DELIVERY <span class="mes_rb_intspan">(4)</span></label>
                             </div>
                         </td>
-                        <td id="mes_wc_cell">
-                            missions selection for workcell later here
+                        <td class="mes_td">
+                            <div id="mes_wc_next_mission_div" class="mes_next_mission_div">
+                                <i>Next mission not known yet.</i>
+                            </div>
+                            <div class="mes_rb_div">
+                                <input type="radio" name="mes_wc_radio" id="mes_wc_radio1" class="mes_rb_input" checked/>
+                                <label for="mes_wc_radio1" class="mes_rb_label" onclick="wc_on_mes_change(1);">PICK RED <span class="mes_rb_intspan">(1)</span></label>
+                            </div>
+
+                            <div class="mes_rb_div">
+                                <input type="radio" name="mes_wc_radio" id="mes_wc_radio2" class="mes_rb_input"/>
+                                <label for="mes_wc_radio2" class="mes_rb_label" onclick="wc_on_mes_change(2);">PICK BLUE <span class="mes_rb_intspan">(2)</span></label>
+                            </div>
+
+                            <div class="mes_rb_div">
+                                <input type="radio" name="mes_wc_radio" id="mes_wc_radio3" class="mes_rb_input"/>
+                                <label for="mes_wc_radio3" class="mes_rb_label" onclick="wc_on_mes_change(3);">PICK YELLOW <span class="mes_rb_intspan">(3)</span></label>
+                            </div>
                         </td></tr>
                     </table>
                 </section>

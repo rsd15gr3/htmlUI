@@ -90,6 +90,18 @@ function tabs_clicked() {
     }
 }
 
+function deg_to_rad(degrees) {
+    var radians = new Array(degrees.length);
+    for (var i in degrees) {
+        radians[i] = degrees[i]*(Math.PI/180.0)
+    }
+    return radians
+}
+
+function round_2(floating_num) {
+    return Math.round(floating_num * 100) / 100
+}
+
 /* Show text in self-created console in our UI */
 function to_console(text) {
     var ta = document.getElementById('textarea_console');

@@ -6,7 +6,7 @@ function wc_init_ros() {
     $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_workcell.txt')+'&callback=?',
         function (data) {
             ip_workcell = data.contents;      // Connect HMI to Workcel PC
-            //ip_workcell = '10.125.5.72';       // Test HMI on your computer (put your IP)
+            //ip_workcell = '10.125.7.23';       // Test HMI on your computer (put your IP)
             wc_got_ip();
             wc_connect_roscore();
     });
@@ -41,7 +41,7 @@ function wc_connect_roscore() {
     wc_tp_automode = new ROSLIB.Topic({
         ros : ros_workcell,
         name : '/ui/wc_automode',
-        messageType : 'msgs/BoolStamped'
+        messageType : 'std_msgs/Bool'
     });
 
     wc_tp_usbcam = new ROSLIB.Topic({
@@ -50,28 +50,34 @@ function wc_connect_roscore() {
         messageType : 'sensor_msgs/CompressedImage'
     });
 
+    wc_tp_mes_control = new ROSLIB.Topic({
+        ros : ros_workcell,
+        name : '/ui/mes',
+        messageType : 'std_msgs/Int8'
+    });
+
     belt_tp_automode = new ROSLIB.Topic({
         ros : ros_workcell,
         name : '/ui/belt_automode',
-        messageType : 'msgs/BoolStamped'
+        messageType : 'std_msgs/Bool'
     });
 
     belt_tp_activated = new ROSLIB.Topic({
         ros : ros_workcell,
         name : '/ui/belt_activated',
-        messageType : 'msgs/BoolStamped'
+        messageType : 'std_msgs/Bool'
     });
 
     belt_tp_forward = new ROSLIB.Topic({
         ros : ros_workcell,
         name : '/ui/belt_forward',
-        messageType : 'msgs/BoolStamped'
+        messageType : 'std_msgs/Bool'
     });
 
     belt_tp_speed = new ROSLIB.Topic({
         ros : ros_workcell,
         name : '/ui/belt_speed',
-        messageType : 'msgs/IntStamped'
+        messageType : 'std_msgs/Int8'
     });
 
     // Workcell control mode
@@ -111,6 +117,12 @@ function wc_connect_roscore() {
         serviceType: 'kuka_ros/getConfiguration'
     });
 
+    wc_srv_setconf = new ROSLIB.Service({
+        ros : ros_workcell,
+        name : '/KukaNode/SetConfiguration',
+        serviceType: 'kuka_ros/setConfiguration'
+    });
+
     wc_srv_topics = new ROSLIB.Service({
         ros : ros_workcell,
         name : '/rosapi/topics',
@@ -133,7 +145,7 @@ function wc_connect_roscore() {
     wc_monitor_interval = setInterval(wc_update_ros_structure, 1000);
 
     // Update Kuka configuration every 50 ms
-    //wc_kuka_conf_interval = setInterval(wc_update_kuka_conf, 50);
+    wc_kuka_conf_interval = setInterval(wc_call_srv_getconf, 50);
 }
 
 function wc_got_ip() {
@@ -152,10 +164,8 @@ function wc_ros_connected() {
     document.getElementById("wc_manual_control_frame").style.opacity = 1.0;
     document.getElementById("img_safety_button_wc").style.cursor = "pointer";
     document.getElementById("wc_man_auto_switch").disabled = '';
-    var btns = document.getElementsByClassName("wc_mc_table_button");
-    for(var i = 0; i < btns.length; i++) {
-       btns.item(i).disabled = '';
-    }
+    wc_enable_manual_control();
+
 
     // Enable control of Belt
     document.getElementById("belt_manual_control_frame").style.opacity = 1.0;
@@ -174,12 +184,7 @@ function wc_ros_disconnected() {
     // Workcell Monitoring
     document.getElementById("wc_monitor_mode").innerHTML = "&nbsp;";
     document.getElementById("wc_monitor_mission").innerHTML = "&nbsp;";
-    document.getElementById("wc_monitor_j0").innerHTML = "&nbsp;";
-    document.getElementById("wc_monitor_j1").innerHTML = "&nbsp;";
-    document.getElementById("wc_monitor_j2").innerHTML = "&nbsp;";
-    document.getElementById("wc_monitor_j3").innerHTML = "&nbsp;";
-    document.getElementById("wc_monitor_j4").innerHTML = "&nbsp;";
-    document.getElementById("wc_monitor_j5").innerHTML = "&nbsp;";
+    wc_erase_monitor_conf();
 
     // Workcell Control Options
     document.getElementById("wc_manual_control_frame").style.opacity = 0.5;
@@ -187,16 +192,14 @@ function wc_ros_disconnected() {
     document.getElementById("img_safety_button_wc").onclick = ""
     document.getElementById("img_safety_button_wc").style.cursor = "wait";
     document.getElementById("wc_man_auto_switch").disabled = 'disabled';
-    var btns = document.getElementsByClassName("wc_mc_table_button");
-    for(var i = 0; i < btns.length; i++) {
-       btns.item(i).disabled = 'disabled';
-    }
+    wc_disable_manual_control();
+
 
     // Belt Monitoring
     document.getElementById("belt_monitor_mode").innerHTML = "&nbsp;";
     document.getElementById("belt_monitor_status").innerHTML = "&nbsp;";
     document.getElementById("belt_monitor_direction").innerHTML = "&nbsp;";
-    document.getElementById("belt_monitor_velocity").innerHTML = "&nbsp;";
+    document.getElementById("belt_monitor_speed").innerHTML = "&nbsp;";
 
     // Belt Control Options
     document.getElementById("belt_manual_control_frame").style.opacity = 0.5;
@@ -231,14 +234,35 @@ function wc_ros_msg(data_str) {
 }
 
 /* This function is being run in a loop, it updates Kuka's configuration */
-function wc_update_kuka_conf() {
+function wc_call_srv_getconf() {
     try {
         wc_srv_getconf.callService(new ROSLIB.ServiceRequest(), function(result) {
-            //console.log(result.q[0]);
-            wc_update_kuka_configuration(result.q);
+            current_kuka_configuration = result.q;
+            wc_update_kuka_configuration();
+            kuka_deadman = true;
+            wc_enable_manual_control();
         });
     } catch (err) {
+        kuka_deadman = false;
+        wc_disable_manual_control();
+        wc_erase_monitor_conf();
         console.log(err.message);
+    }
+}
+
+function wc_call_srv_setconf(new_conf_deg) {
+    if (kuka_deadman) {
+        new_conf_rad = deg_to_rad(new_conf_deg);
+        var request = new ROSLIB.ServiceRequest({
+            q : new_conf_rad,
+            speed : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            acc : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        });
+        wc_srv_setconf.callService(request, function(result) {
+            to_console('New conf sent [rad]: '+new_conf_rad);
+        });
+    } else {
+        to_console('You cannot set Kuka configuration, because you have failed to read it.');
     }
 }
 
@@ -270,3 +294,8 @@ function wc_update_ros_structure() {
         console.log(err.message);
     }
 };
+
+function wc_on_mes_change(value) {
+    var msg = new ROSLIB.Message({data : value});
+    wc_tp_mes_control.publish(msg);
+}

@@ -11,8 +11,8 @@ function frobit_make_automode_false() {
 
 /* Change on the joystick */
 function frobit_joystick_moved(x0, y0, x, y) {
-    var x_rounded = Math.round(x * 100) / 100;
-    var y_rounded = Math.round(y * 100) / 100;
+    var x_rounded = round_2(x);
+    var y_rounded = round_2(y);
     frobit_ros_msg('frobit_joystick_'+x0+";"+y0+";"+x_rounded+";"+y_rounded);
 }
 
@@ -54,8 +54,8 @@ function frobit_got_mode(message) {
 }
 
 function frobit_got_velocities(message) {
-    document.getElementById("mr_monitor_linvel").innerHTML = Math.round(message.twist.linear.x * 100) / 100;
-    document.getElementById("mr_monitor_angvel").innerHTML = Math.round(message.twist.angular.z * 100) / 100;
+    document.getElementById("mr_monitor_linvel").innerHTML = round_2(message.twist.linear.x);
+    document.getElementById("mr_monitor_angvel").innerHTML = round_2(message.twist.angular.z);
 }
 
 function frobit_got_camera_data(message) {

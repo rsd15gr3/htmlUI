@@ -35,23 +35,47 @@ function wc_man_auto_changed() {
 }
 
 /* Manual control for workcell : configuration changed down */
-function wc_mc_joint_down(joint_id) {
-    var slider = document.getElementById('wc_mc_slider_'+joint_id);
-    var new_val = parseFloat(slider.value)-parseFloat(wc_mc_joint_step);
-    if (parseFloat(new_val) >= parseFloat(slider.min)) {
-        wc_ros_msg('wc_joint_'+joint_id+'_down');
-        to_console('WC: Joint '+joint_id+' set to '+new_val);
+function wc_mc_joint_down(joint_ind) {
+    var conf = current_kuka_configuration;
+    var joint_ind = parseInt(joint_ind);
+    try {
+        var old_joint_value = conf[joint_ind];
+        var new_val = parseFloat(old_joint_value)-parseFloat(wc_mc_joint_step);
+        var slider = document.getElementById('wc_mc_slider_j'+joint_ind);
+        if (new_val >= parseFloat(slider.min)) {
+            conf[joint_ind] = new_val;
+            wc_call_srv_setconf(conf);
+        } else {
+            to_console('NOT allowed. You are trying to get out of bounds.');
+        }
+    } catch (err) {
+        to_console('Not possible to set a new configuration. ');
+        console.log('Setting new conf error: '+err);
     }
 }
 
 /* Manual control for workcell : configuration changed up */
-function wc_mc_joint_up(joint_id) {
-    var slider = document.getElementById('wc_mc_slider_'+joint_id);
-    var new_val = parseFloat(slider.value)+parseFloat(wc_mc_joint_step);
-    if (parseFloat(new_val) <= parseFloat(slider.max)) {
-        wc_ros_msg('wc_joint_'+joint_id+'_up');
-        to_console('WC: Joint '+joint_id+' set to '+new_val);
+function wc_mc_joint_up(joint_ind) {
+    var conf = current_kuka_configuration;
+    var joint_ind = parseInt(joint_ind);
+    try {
+        var old_joint_value = conf[joint_ind];
+        var new_val = parseFloat(old_joint_value)+parseFloat(wc_mc_joint_step);
+        var slider = document.getElementById('wc_mc_slider_j'+joint_ind);
+        if (new_val <= parseFloat(slider.max)) {
+            conf[joint_ind] = new_val;
+            wc_call_srv_setconf(conf);
+        } else {
+            to_console('NOT allowed. You are trying to get out of bounds.');
+        }
+    } catch (err) {
+        to_console('Not possible to set a new configuration. ');
+        console.log('Setting new conf error: '+err);
     }
+}
+
+function wc_mc_init_pos() {
+    wc_call_srv_setconf([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
 }
 
 function wc_got_mode(message) {
@@ -113,23 +137,55 @@ function wc_init_manual_control() {
     document.getElementById('wc_mc_slider_j5').value = parseFloat(wc_mc_j5_init);
     document.getElementById('wc_mc_min_j5').innerHTML = parseFloat(wc_mc_j5_min);
     document.getElementById('wc_mc_max_j5').innerHTML = parseFloat(wc_mc_j5_max);
+
+    // step
+    document.getElementById('wc_mc_step_td').innerHTML = "single step: "+parseFloat(wc_mc_joint_step)+" degrees";
 }
 
 /* Sets KUKA configuration after reading it */
-function wc_update_kuka_configuration(q) {
+function wc_update_kuka_configuration() {
     // Sliders
-    document.getElementById('wc_mc_slider_j0').value = parseFloat(q[0]);
-    document.getElementById('wc_mc_slider_j1').value = parseFloat(q[1]);
-    document.getElementById('wc_mc_slider_j2').value = parseFloat(q[2]);
-    document.getElementById('wc_mc_slider_j3').value = parseFloat(q[3]);
-    document.getElementById('wc_mc_slider_j4').value = parseFloat(q[4]);
-    document.getElementById('wc_mc_slider_j5').value = parseFloat(q[5]);
+    document.getElementById('wc_mc_slider_j0').value = parseFloat(current_kuka_configuration[0]);
+    document.getElementById('wc_mc_slider_j1').value = parseFloat(current_kuka_configuration[1]);
+    document.getElementById('wc_mc_slider_j2').value = parseFloat(current_kuka_configuration[2]);
+    document.getElementById('wc_mc_slider_j3').value = parseFloat(current_kuka_configuration[3]);
+    document.getElementById('wc_mc_slider_j4').value = parseFloat(current_kuka_configuration[4]);
+    document.getElementById('wc_mc_slider_j5').value = parseFloat(current_kuka_configuration[5]);
 
     // Monitor cells
-    document.getElementById('wc_monitor_j0').innerHTML = q[0];
-    document.getElementById('wc_monitor_j1').innerHTML = q[1];
-    document.getElementById('wc_monitor_j2').innerHTML = q[2];
-    document.getElementById('wc_monitor_j3').innerHTML = q[3];
-    document.getElementById('wc_monitor_j4').innerHTML = q[4];
-    document.getElementById('wc_monitor_j5').innerHTML = q[5];
+    document.getElementById('wc_monitor_j0').innerHTML = round_2(current_kuka_configuration[0]);
+    document.getElementById('wc_monitor_j1').innerHTML = round_2(current_kuka_configuration[1]);
+    document.getElementById('wc_monitor_j2').innerHTML = round_2(current_kuka_configuration[2]);
+    document.getElementById('wc_monitor_j3').innerHTML = round_2(current_kuka_configuration[3]);
+    document.getElementById('wc_monitor_j4').innerHTML = round_2(current_kuka_configuration[4]);
+    document.getElementById('wc_monitor_j5').innerHTML = round_2(current_kuka_configuration[5]);
+}
+
+function wc_disable_manual_control() {
+    var btns = document.getElementsByClassName("wc_mc_table_button");
+    for(var i = 0; i < btns.length; i++) {
+       btns.item(i).disabled = 'disabled';
+       btns.item(i).style.opacity = 0.5;
+    }
+    document.getElementById("wc_mc_go_to_init_button").disabled = 'disabled';
+    document.getElementById("wc_mc_go_to_init_button").style.opacity = 0.5;
+}
+
+function wc_enable_manual_control() {
+    var btns = document.getElementsByClassName("wc_mc_table_button");
+    for(var i = 0; i < btns.length; i++) {
+       btns.item(i).disabled = '';
+       btns.item(i).style.opacity = 1.0;
+    }
+    document.getElementById("wc_mc_go_to_init_button").disabled = '';
+    document.getElementById("wc_mc_go_to_init_button").style.opacity = 1.0;
+}
+
+function wc_erase_monitor_conf() {
+    document.getElementById("wc_monitor_j0").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j1").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j2").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j3").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j4").innerHTML = "&nbsp;";
+    document.getElementById("wc_monitor_j5").innerHTML = "&nbsp;";
 }

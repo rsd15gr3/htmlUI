@@ -162,6 +162,19 @@ table.tab_divide_table td {
     border-radius: 10px;
 }
 
+#wc_mc_step_td {
+    font-size: 11px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#wc_mc_go_to_init_button {
+    font-size: 13px;
+    padding: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 table#wc_mc_table th {
     width: 100px;
     font-size: 11px;
@@ -285,7 +298,7 @@ table#wc_mc_table th {
     float: right;
 }
 
-#mes_mr_next_mission_div {
+.mes_next_mission_div {
     position: relative;
     top: 20px;
     left: 20px;
@@ -298,6 +311,10 @@ table#wc_mc_table th {
     margin-bottom: 20px;
     border: 1px solid #eee;
     border-radius: 7px;
+}
+
+.mes_td {
+    vertical-align: top;
 }
 
 /* --------------------- Safety buttons (stop buttons) ----------------- */

@@ -97,9 +97,9 @@ function frobit_connect_roscore() {
     });
 
     // Image from MR usbcam
-    frobit_tp_usbcam.subscribe(function(message) {
+    /*frobit_tp_usbcam.subscribe(function(message) {
         frobit_got_camera_data(message);
-    });
+    });*/
 
     // Tipper automode state subscription
     tipper_tp_automode.subscribe(function(message) {

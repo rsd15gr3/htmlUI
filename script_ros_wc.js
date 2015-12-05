@@ -86,9 +86,9 @@ function wc_connect_roscore() {
     });
 
     // Image from WC usbcam
-    wc_tp_usbcam.subscribe(function(message) {
+    /*wc_tp_usbcam.subscribe(function(message) {
         document.getElementById("cam_wc_img").src = "data:image/png;base64,"+message.data;
-    });
+    });*/
 
     // Belt control mode
     belt_tp_automode.subscribe(function(message) {

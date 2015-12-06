@@ -53,6 +53,15 @@ function frobit_got_mode(message) {
     }
 }
 
+function frobit_got_battery_level(message) {
+    document.getElementById("mr_monitor_battery_level").innerHTML = round_2(message.data)+" V";
+    if (message.data < 12) {
+        document.getElementById("mr_monitor_battery_level").style.backgroundColor = "Red";
+    } else {
+        document.getElementById("mr_monitor_battery_level").style.backgroundColor = "LightGreen";
+    }
+}
+
 function frobit_got_velocities(message) {
     document.getElementById("mr_monitor_linvel").innerHTML = round_2(message.twist.linear.x);
     document.getElementById("mr_monitor_angvel").innerHTML = round_2(message.twist.angular.z);

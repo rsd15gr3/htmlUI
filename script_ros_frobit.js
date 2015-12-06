@@ -6,7 +6,7 @@ function frobit_init_ros() {
     $.getJSON('http://whateverorigin.org/get?url='+encodeURIComponent('http://evee.cz/sdu/rsd/ips/ip_frobit.txt')+'&callback=?',
         function (data) {
             ip_frobit = data.contents;    // Connect HMI to Frobit
-            //ip_frobit = '10.125.7.186';     // Test HMI on your computer (put your IP)
+            //ip_frobit = '10.125.5.144';     // Test HMI on your computer (put your IP)
             frobit_got_ip();
             frobit_connect_roscore();
     });
@@ -63,6 +63,12 @@ function frobit_connect_roscore() {
         messageType : 'std_msgs/String'
     });
 
+    frobit_tp_battery_level = new ROSLIB.Topic({
+        ros : ros_frobit,
+        name : '/battery_monitor/battery_level',
+        messageType : 'msgs/FloatStamped'
+    });
+
     frobit_tp_usbcam = new ROSLIB.Topic({
         ros : ros_frobit,
         name : '/usb_cam/image_raw/compressed',
@@ -94,6 +100,11 @@ function frobit_connect_roscore() {
     // Mobile Robot next mission subscription
     frobit_tp_next_mission.subscribe(function(message) {
         frobit_got_next_mission(message);
+    });
+
+    // Mobile Robot next mission subscription
+    frobit_tp_battery_level.subscribe(function(message) {
+        frobit_got_battery_level(message);
     });
 
     // Image from MR usbcam

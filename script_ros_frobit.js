@@ -182,6 +182,7 @@ function frobit_ros_disconnected() {
     document.getElementById("mr_monitor_position").innerHTML = "&nbsp;";
     document.getElementById("mr_monitor_linvel").innerHTML = "&nbsp;";
     document.getElementById("mr_monitor_angvel").innerHTML = "&nbsp;";
+    document.getElementById("mr_monitor_battery_level").innerHTML = "&nbsp;";
 
     //Frobit Control Options
     document.getElementById("mr_manual_control_frame").style.opacity = 0.5;
